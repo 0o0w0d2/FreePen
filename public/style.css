@@ -1,17 +1,33 @@
-body {
-  margin: 0;
-}
-.nav {
-  display: flex;
-  padding: 15px;
-  align-items: center;
-  background: white;
+@import url('https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css');
+
+@font-face {
+    font-family: 'HakgyoansimWoojuR';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimWoojuR.woff2')
+        format('woff2');
+    font-weight: normal;
+    font-style: normal;
 }
 
-.nav a {
-  margin-right: 10px;
+@font-face {
+    font-family: 'GapyeongHanseokbong-Bold';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/GapyeongHanseokbong-Bold.woff2')
+        format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SeoulNamsanM';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/SeoulNamsanM.woff')
+        format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'SeoulNamsanM', 'NanumSquare';
 }
 
 .logo {
-  font-weight: bold;
+    font-family: 'GapyeongHanseokbong-Bold';
 }

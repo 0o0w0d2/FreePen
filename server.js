@@ -4,6 +4,7 @@ const connectToMongoDB = require('./db');
 require('dotenv').config();
 
 app.use(express.static(__dirname + '/public'));
+app.set('view engine', 'ejs');
 
 const port = process.env.PORT;
 
@@ -19,11 +20,10 @@ const startServer = async () => {
 startServer();
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.render('index.ejs');
 });
 
-app.get('/list', async (req, res) => {
+app.get('/post/list', async (req, res) => {
     const postList = await db.collection('post').find().toArray();
-    console.log(postList);
-    res.send();
+    res.render('list.ejs', { postList: postList });
 });
