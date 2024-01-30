@@ -2,6 +2,8 @@ const express = require('express');
 const postRouter = express.Router();
 const { ObjectId } = require('mongodb');
 
+// 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
+
 // GET ) post list 페이지
 postRouter.get('/list', async (req, res, next) => {
     try {
@@ -15,13 +17,13 @@ postRouter.get('/list', async (req, res, next) => {
     }
 });
 
-// GET ) post 작성 페이지
+// GET ) post add 페이지
 postRouter.get('/write', async (req, res) => {
     res.render('write.ejs');
 });
 
 // validation 라이브러리를 설치할까?
-// POST ) post 작성
+// POST ) post
 postRouter.post('/', async (req, res) => {
     try {
         const { title, content } = req.body;
@@ -78,6 +80,44 @@ postRouter.get('/:postId', async (req, res, next) => {
 
         res.status(err.statusCode || 500).send({ message: err.message });
     }
+});
+
+// GET ) post edit form
+postRouter.get('/:postId/edit', async (req, res) => {
+    const postId = req.params.postId;
+    const _id = new ObjectId(postId);
+
+    const post = await db.collection('post').findOne({ _id });
+    res.render('edit.ejs', { post: post });
+});
+
+// PUT인데 post로 처리 ) post 수정
+postRouter.post('/:postId', async (req, res) => {
+    const postId = req.params.postId;
+
+    try {
+        const _id = new ObjectId(postId);
+        console.log(req.body);
+        const { title, content } = req.body;
+
+        await db
+            .collection('post')
+            .updateOne({ _id }, { $set: { title, content } });
+
+        res.redirect(`/post/${postId}`);
+    } catch (err) {
+        console.log(err);
+        res.status(err.statusCode || 500).send({ message: err.message });
+    }
+});
+
+postRouter.post('/:postId/delete', async (req, res) => {
+    const postId = req.params.postId;
+    const _id = new ObjectId(postId);
+
+    await db.collection('post').deleteOne({ _id });
+
+    res.redirect('/post/list');
 });
 
 module.exports = postRouter;

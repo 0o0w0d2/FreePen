@@ -16,7 +16,7 @@
     <body>
         <%- include('nav.ejs') %> <% for (let i = 0; i < postList.length; i++){
         %>
-        <div class="card my-3 mx-3 px-2 py-2" style="max-width: 100%">
+        <div class="card my-3 mx-3 px-2 py-2 listcard" style="max-width: 100%">
             <a href="/post/<%= postList[i]._id %>">
                 <div class="row g-0">
                     <div class="col-md-4">
