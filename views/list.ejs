@@ -17,22 +17,28 @@
         <%- include('nav.ejs') %> <% for (let i = 0; i < postList.length; i++){
         %>
         <div class="card my-3 mx-3 px-2 py-2" style="max-width: 100%">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="..." class="img-fluid rounded-start" alt="..." />
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title"><%= postList[i].title %></h5>
-                        <p class="card-text"><%= postList[i].content %></p>
-                        <p class="card-text">
-                            <small class="text-body-secondary"
-                                >Last updated 3 mins ago</small
-                            >
-                        </p>
+            <a href="/post/<%= postList[i]._id %>">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img
+                            src="..."
+                            class="img-fluid rounded-start"
+                            alt="..."
+                        />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= postList[i].title %></h5>
+                            <p class="card-text"><%= postList[i].content %></p>
+                            <p class="card-text">
+                                <small class="text-body-secondary"
+                                    ><%= postList[i].createdAt %></small
+                                >
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         <% } %>
 

@@ -31,3 +31,8 @@
 .logo {
     font-family: 'GapyeongHanseokbong-Bold';
 }
+
+.card a {
+    text-decoration: none;
+    color: inherit;
+}
