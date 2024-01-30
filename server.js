@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const connectToMongoDB = require('./db');
 require('dotenv').config();
+const { ObjectId } = require('mongodb');
 const postRouter = require('./router/postRouter');
 
 app.use(express.static(__dirname + '/public'));
