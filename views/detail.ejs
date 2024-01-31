@@ -31,7 +31,7 @@
                     >
                     <button
                         class="btn btn-sm btn-outline-danger delete"
-                        value="<%= post._id %>"
+                        data-id="<%= post._id %>"
                     >
                         삭제
                     </button>
@@ -49,9 +49,9 @@
         <script>
             document
                 .querySelectorAll('.delete')[0]
-                .addEventListener('click', async function () {
+                .addEventListener('click', async function (e) {
                     try {
-                        const postId = this.value;
+                        const postId = e.target.dataset.id;
                         const response = await fetch(`/post/${postId}`, {
                             method: 'DELETE',
                             headers: {

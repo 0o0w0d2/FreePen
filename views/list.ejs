@@ -18,7 +18,7 @@
         <div class="container mx-3 my-5">목록이 없습니다</div>
         <% } %> <% for (let i = 0; i < postList.length; i++){ %>
         <div class="card my-3 mx-3 px-2 py-2 listcard" style="max-width: 100%">
-            <a href="/post/<%= postList[i]._id %>">
+            <a href="/post/<%= postList[i]._id %>" class="none">
                 <div class="row g-0">
                     <div class="col-md-4">
                         <img src="" class="img-fluid rounded-start" alt="..." />
@@ -31,8 +31,48 @@
                     </div>
                 </div>
             </a>
+            <div>
+                <a
+                    href="/post/edit/<%= postList[i]._id %>"
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                >
+                    수정</a
+                >
+                <button
+                    class="btn btn-sm btn-outline-danger delete"
+                    data-id="<%= postList[i]._id %>"
+                >
+                    삭제
+                </button>
+            </div>
         </div>
+
         <% } %>
+
+        <script>
+            document
+                .querySelectorAll('.delete')[0]
+                .addEventListener('click', async function (e) {
+                    try {
+                        const postId = e.target.dataset.id;
+                        const response = await fetch(`/post/${postId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (response.ok) {
+                            window.location.href = '/post/list';
+                        } else {
+                            console.error('삭제 실패');
+                        }
+                    } catch (err) {
+                        console.error('네트워크 오류', err);
+                    }
+                });
+        </script>
 
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

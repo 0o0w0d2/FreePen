@@ -32,7 +32,7 @@
     font-family: 'GapyeongHanseokbong-Bold';
 }
 
-.listcard a {
+.listcard .none {
     text-decoration: none;
     color: inherit;
 }
