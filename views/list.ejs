@@ -51,27 +51,29 @@
         <% } %>
 
         <script>
-            document
-                .querySelectorAll('.delete')[0]
-                .addEventListener('click', async function (e) {
-                    try {
-                        const postId = e.target.dataset.id;
-                        const response = await fetch(`/post/${postId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                        });
+            for (let i = 0; i < '<%= postList.length %>'; i++) {
+                document
+                    .querySelectorAll('.delete')
+                    [i].addEventListener('click', async function (e) {
+                        try {
+                            const postId = e.target.dataset.id;
+                            const response = await fetch(`/post/${postId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                            });
 
-                        if (response.ok) {
-                            window.location.href = '/post/list';
-                        } else {
-                            console.error('삭제 실패');
+                            if (response.ok) {
+                                window.location.href = '/post/list';
+                            } else {
+                                console.error('삭제 실패');
+                            }
+                        } catch (err) {
+                            console.error('네트워크 오류', err);
                         }
-                    } catch (err) {
-                        console.error('네트워크 오류', err);
-                    }
-                });
+                    });
+            }
         </script>
 
         <script
