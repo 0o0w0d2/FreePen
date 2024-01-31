@@ -65,7 +65,8 @@
                             });
 
                             if (response.ok) {
-                                window.location.href = '/post/list';
+                                e.target.parentElement.parentElement.style.display =
+                                    'none';
                             } else {
                                 console.error('삭제 실패');
                             }
