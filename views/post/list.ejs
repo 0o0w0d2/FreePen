@@ -14,7 +14,7 @@
     </head>
 
     <body>
-        <%- include('nav.ejs') %> <% if (postList.length == 0) { %>
+        <%- include('../nav.ejs') %> <% if (postList.length == 0) { %>
         <div class="container mx-3 my-5">목록이 없습니다</div>
         <% } %> <% for (let i = 0; i < postList.length; i++){ %>
         <div class="card my-3 mx-3 px-2 py-2 listcard" style="max-width: 100%">

@@ -6,7 +6,7 @@ const saltRound = parseInt(process.env.SALT);
 
 // GET 회원가입 폼
 userRouter.get('/register', async (req, res) => {
-    res.render('register.ejs');
+    res.render('user/register.ejs');
 });
 
 // POST 회원가입
@@ -28,7 +28,7 @@ userRouter.post('/register', async (req, res) => {
 
 // GET 로그인 폼
 userRouter.get('/login', async (req, res) => {
-    res.render('login.ejs');
+    res.render('user/login.ejs');
 });
 
 // POST 로그인

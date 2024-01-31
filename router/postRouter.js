@@ -17,7 +17,7 @@ postRouter.get('/list/:page', async (req, res) => {
         }
 
         if (postCount == 0) {
-            return res.render('list.ejs', {
+            return res.render('post/list.ejs', {
                 postList: [],
                 page: 1,
                 maxPage: 1,
@@ -37,7 +37,7 @@ postRouter.get('/list/:page', async (req, res) => {
             .skip((page - 1) * 5)
             .toArray();
 
-        res.render('list.ejs', {
+        res.render('post/list.ejs', {
             postList: postList,
             page: page,
             maxPage: maxPage,
@@ -50,7 +50,7 @@ postRouter.get('/list/:page', async (req, res) => {
 
 // GET ) post add 페이지
 postRouter.get('/write', async (req, res) => {
-    res.render('write.ejs');
+    res.render('post/write.ejs');
 });
 
 // validation 라이브러리를 설치할까?
@@ -108,7 +108,7 @@ postRouter.get('/:postId', async (req, res, next) => {
             throw error;
         }
 
-        res.render('detail.ejs', { post: post });
+        res.render('post/detail.ejs', { post: post });
     } catch (err) {
         console.log(err);
 
@@ -130,7 +130,7 @@ postRouter.get('/edit/:postId', async (req, res) => {
             throw error;
         }
 
-        res.render('edit.ejs', { post: post });
+        res.render('post/edit.ejs', { post: post });
     } catch (err) {
         console.log(err);
 

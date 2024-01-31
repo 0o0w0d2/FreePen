@@ -14,9 +14,9 @@
     </head>
 
     <body>
-        <%- include('nav.ejs') %>
+        <%- include('../nav.ejs') %>
         <div class="mx-3 mt-3 pt-3 px-3">
-            <form action="/post/<%= post._id %>?_method=PUT" method="POST">
+            <form action="/post" method="POST">
                 <div class="mb-3">
                     <label for="title" class="form-label">title</label>
                     <input
@@ -25,7 +25,6 @@
                         id="postTitle"
                         placeholder="title"
                         name="title"
-                        value="<%= post.title %>"
                     />
                 </div>
                 <div class="mb-3">
@@ -36,12 +35,10 @@
                         rows="3"
                         placeholder="content"
                         name="content"
-                    >
-<%= post.content %></textarea
-                    >
+                    ></textarea>
                 </div>
                 <button class="btn btn-outline-secondary btn-sm" type="submit">
-                    수정
+                    작성
                 </button>
             </form>
         </div>
