@@ -107,8 +107,8 @@ postRouter.get('/edit/:postId', async (req, res) => {
     }
 });
 
-// PUT인데 post로 처리 ) post 수정
-postRouter.post('/:postId', async (req, res) => {
+// PUT ) post 수정 (method-override lib 사용)
+postRouter.put('/:postId', async (req, res) => {
     try {
         const postId = req.params.postId;
 

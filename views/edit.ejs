@@ -16,7 +16,7 @@
     <body>
         <%- include('nav.ejs') %>
         <div class="mx-3 mt-3 pt-3 px-3">
-            <form action="/post/<%= post._id %>" method="POST">
+            <form action="/post/<%= post._id %>?_method=PUT" method="POST">
                 <div class="mb-3">
                     <label for="title" class="form-label">title</label>
                     <input

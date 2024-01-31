@@ -3,6 +3,9 @@ const app = express();
 const connectToMongoDB = require('./db');
 require('dotenv').config();
 const postRouter = require('./router/postRouter');
+const methodOverride = require('method-override');
+
+app.use(methodOverride('_method'));
 
 app.use(express.static(__dirname + '/public'));
 app.set('view engine', 'ejs');
