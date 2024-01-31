@@ -141,13 +141,13 @@ postRouter.put('/:postId', async (req, res) => {
 });
 
 // post -> delete 로 메소드 바꾼 후에 uri 변경하기
-postRouter.post('/delete/:postId', async (req, res) => {
+postRouter.delete('/:postId', async (req, res) => {
     const postId = req.params.postId;
     const _id = new ObjectId(postId);
 
     await db.collection('post').deleteOne({ _id });
 
-    res.redirect('/post/list');
+    res.status(204).send({ message: '삭제 완료' });
 });
 
 module.exports = postRouter;
