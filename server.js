@@ -3,6 +3,7 @@ const app = express();
 const connectToMongoDB = require('./db');
 require('dotenv').config();
 const postRouter = require('./router/postRouter');
+const userRouter = require('./router/userRouter');
 const methodOverride = require('method-override');
 
 app.use(methodOverride('_method'));
@@ -29,3 +30,5 @@ app.get('/', (req, res) => {
 });
 
 app.use('/post', postRouter);
+
+app.use('/user', userRouter);

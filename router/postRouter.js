@@ -17,31 +17,31 @@ postRouter.get('/list/:page', async (req, res) => {
         }
 
         if (postCount == 0) {
-            res.render('list.ejs', {
+            return res.render('list.ejs', {
                 postList: [],
                 page: 1,
                 maxPage: 1,
             });
-        } else {
-            if (page > maxPage) {
-                const error = new Error('찾을 수 없는 페이지입니다.');
-                error.statusCode = 404;
-                throw error;
-            }
-
-            const postList = await db
-                .collection('post')
-                .find()
-                .limit(5)
-                .skip((page - 1) * 5)
-                .toArray();
-
-            res.render('list.ejs', {
-                postList: postList,
-                page: page,
-                maxPage: maxPage,
-            });
         }
+
+        if (page > maxPage) {
+            const error = new Error('찾을 수 없는 페이지입니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const postList = await db
+            .collection('post')
+            .find()
+            .limit(5)
+            .skip((page - 1) * 5)
+            .toArray();
+
+        res.render('list.ejs', {
+            postList: postList,
+            page: page,
+            maxPage: maxPage,
+        });
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send({ message: err.message });
