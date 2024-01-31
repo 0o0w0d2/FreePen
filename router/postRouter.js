@@ -4,16 +4,34 @@ const { ObjectId } = require('mongodb');
 
 // 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
 
-// GET ) post list 페이지
-postRouter.get('/list', async (req, res, next) => {
+postRouter.get('/list/:page', async (req, res) => {
     try {
-        const db = req.app.locals.db;
-        const postList = await db.collection('post').find().toArray();
+        const page = req.params.page;
+        const postCount = await db.collection('post').countDocuments();
+        const maxPage = Math.ceil(postCount / 5);
+        console.log(req.params.page);
 
-        res.render('list.ejs', { postList: postList });
+        if (page != parseInt(page) || page > maxPage || page <= 0) {
+            const error = new Error('찾을 수 없는 페이지입니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const postList = await db
+            .collection('post')
+            .find()
+            .limit(5)
+            .skip((page - 1) * 5)
+            .toArray();
+
+        res.render('list.ejs', {
+            postList: postList,
+            page: page,
+            maxPage: maxPage,
+        });
     } catch (err) {
         console.log(err);
-        res.send({ message: err.message });
+        res.status(err.statusCode || 500).send({ message: err.message });
     }
 });
 
