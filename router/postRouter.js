@@ -9,26 +9,39 @@ postRouter.get('/list/:page', async (req, res) => {
         const page = req.params.page;
         const postCount = await db.collection('post').countDocuments();
         const maxPage = Math.ceil(postCount / 5);
-        console.log(req.params.page);
 
-        if (page != parseInt(page) || page > maxPage || page <= 0) {
+        if (page != parseInt(page) || page <= 0) {
             const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
 
-        const postList = await db
-            .collection('post')
-            .find()
-            .limit(5)
-            .skip((page - 1) * 5)
-            .toArray();
+        if (postCount == 0) {
+            res.render('list.ejs', {
+                postList: [],
+                page: 1,
+                maxPage: 1,
+            });
+        } else {
+            if (page > maxPage) {
+                const error = new Error('찾을 수 없는 페이지입니다.');
+                error.statusCode = 404;
+                throw error;
+            }
 
-        res.render('list.ejs', {
-            postList: postList,
-            page: page,
-            maxPage: maxPage,
-        });
+            const postList = await db
+                .collection('post')
+                .find()
+                .limit(5)
+                .skip((page - 1) * 5)
+                .toArray();
+
+            res.render('list.ejs', {
+                postList: postList,
+                page: page,
+                maxPage: maxPage,
+            });
+        }
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send({ message: err.message });
@@ -160,12 +173,25 @@ postRouter.put('/:postId', async (req, res) => {
 
 // post -> delete 로 메소드 바꾼 후에 uri 변경하기
 postRouter.delete('/:postId', async (req, res) => {
-    const postId = req.params.postId;
-    const _id = new ObjectId(postId);
+    try {
+        const postId = req.params.postId;
+        const _id = new ObjectId(postId);
 
-    await db.collection('post').deleteOne({ _id });
+        const post = await db.collection('post').findOne({ _id });
 
-    res.status(204).send({ message: '삭제 완료' });
+        if (!post) {
+            const error = new Error('글을 찾을 수 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        await db.collection('post').deleteOne({ _id });
+
+        res.status(204).send({ message: '삭제 완료' });
+    } catch (err) {
+        console.log(err);
+        res.status(err.statusCode || 500).send({ message: err.message });
+    }
 });
 
 module.exports = postRouter;
