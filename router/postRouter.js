@@ -28,14 +28,16 @@ postRouter.post('/', async (req, res) => {
     try {
         const { title, content } = req.body;
 
+        // 제목이 빈 칸일 때
         if (title == '') {
             const error = new Error('제목이 빈 칸입니다.');
             error.statusCode = 400;
             throw error;
         }
 
+        // 제목이 100자 이상일 때 => 나중에 mongoose 사용으로 넘어가면 좋을듯(type이나 글자 수 제약이 가능하니까)
         if (title.length >= 100) {
-            const error = new Error('제목이 빈 칸입니다.');
+            const error = new Error('제목은 100자를 넘을 수 없습니다.');
             error.statusCode = 400;
             throw error;
         }
@@ -55,10 +57,10 @@ postRouter.post('/', async (req, res) => {
 
 // GET ) post 상세 페이지
 postRouter.get('/:postId', async (req, res, next) => {
-    const postId = req.params.postId;
-    console.log('postId', postId);
-
     try {
+        const postId = req.params.postId;
+
+        // postId의 타입이 objectId가 아닐 때
         if (!ObjectId.isValid(postId)) {
             const error = new Error('올바르지 않은 postId입니다.');
             error.statusCode = 404;
@@ -68,6 +70,7 @@ postRouter.get('/:postId', async (req, res, next) => {
         const _id = new ObjectId(postId);
         const post = await db.collection('post').findOne({ _id: _id });
 
+        // _id가 일치하는 post가 없을 때
         if (!post) {
             const error = new Error('글을 찾을 수 없습니다.');
             error.statusCode = 404;
@@ -82,23 +85,49 @@ postRouter.get('/:postId', async (req, res, next) => {
     }
 });
 
-// GET ) post edit form
-postRouter.get('/:postId/edit', async (req, res) => {
-    const postId = req.params.postId;
-    const _id = new ObjectId(postId);
+// GET ) post-edit form
+postRouter.get('/edit/:postId', async (req, res) => {
+    try {
+        const postId = req.params.postId;
+        const _id = new ObjectId(postId);
 
-    const post = await db.collection('post').findOne({ _id });
-    res.render('edit.ejs', { post: post });
+        const post = await db.collection('post').findOne({ _id });
+
+        if (!post) {
+            const error = new Error('글을 찾을 수 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        res.render('edit.ejs', { post: post });
+    } catch (err) {
+        console.log(err);
+
+        res.status(err.statusCode || 500).send(err.message);
+    }
 });
 
 // PUT인데 post로 처리 ) post 수정
 postRouter.post('/:postId', async (req, res) => {
-    const postId = req.params.postId;
-
     try {
+        const postId = req.params.postId;
+
+        if (!ObjectId.isValid(postId)) {
+            const error = new Error('올바르지 않은 postId입니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
         const _id = new ObjectId(postId);
-        console.log(req.body);
         const { title, content } = req.body;
+
+        const post = await db.collection('post').findOne({ _id });
+
+        if (!post) {
+            const error = new Error('글을 찾을 수 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
 
         await db
             .collection('post')
@@ -111,7 +140,8 @@ postRouter.post('/:postId', async (req, res) => {
     }
 });
 
-postRouter.post('/:postId/delete', async (req, res) => {
+// post -> delete 로 메소드 바꾼 후에 uri 변경하기
+postRouter.post('/delete/:postId', async (req, res) => {
     const postId = req.params.postId;
     const _id = new ObjectId(postId);
 
