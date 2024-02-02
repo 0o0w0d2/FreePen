@@ -13,6 +13,20 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+
+app.use(passport.initialize());
+app.use(
+    session({
+        secret: process.env.SESSION,
+        resave: false,
+        saveUninitialized: false,
+    }),
+);
+app.use(passport.session());
+
 const port = process.env.PORT;
 
 const startServer = async () => {
