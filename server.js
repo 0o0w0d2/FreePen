@@ -5,6 +5,7 @@ require('dotenv').config();
 const postRouter = require('./router/postRouter');
 const userRouter = require('./router/userRouter');
 const methodOverride = require('method-override');
+const MongoStore = require('connect-mongo');
 
 app.use(methodOverride('_method'));
 
@@ -20,17 +21,28 @@ const passportConfig = require('./passport');
 // passport 설정
 passportConfig();
 
+const port = process.env.PORT;
+
 app.use(passport.initialize());
 app.use(
     session({
         secret: process.env.COOKIE_SECRET,
         resave: false,
         saveUninitialized: false,
+        cookie: { maxAge: 1000 * 60 },
+        store: MongoStore.create({
+            mongoUrl: process.env.DB_URI,
+            dbName: 'forum',
+        }),
     }),
 );
 app.use(passport.session());
 
-const port = process.env.PORT;
+// 전역 middleware를 이용해 모든 템플릿에서 'user' 변수 사용할 수 있게 설정
+app.use((req, res, next) => {
+    res.locals.user = req.user;
+    next();
+});
 
 const startServer = async () => {
     const db = await connectToMongoDB();

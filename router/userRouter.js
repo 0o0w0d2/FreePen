@@ -79,9 +79,14 @@ userRouter.get('/mypage', isLogin, async (req, res, next) => {
 });
 
 userRouter.get('/logout', isLogin, async (req, res, next) => {
-    req.logout();
-    req.session.destroy();
-    res.redirect('/');
+    req.logout((err) => {
+        // req.session.destroy(() => { // 세션 파기 후에 콜백으로 쿠키 제거
+        //     res.clearCookie('connect.sid'); // 세션 쿠키 제거
+        //     res.redirect('/'); // 로그아웃 후 메인 페이지로 리디렉션
+        // });
+        if (err) return next(err);
+        res.redirect('/');
+    });
 });
 
 module.exports = userRouter;
