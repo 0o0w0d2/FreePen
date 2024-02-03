@@ -25,9 +25,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/post/list/1">List</a>
                 </li>
+                <% if (user) { %>
                 <li class="nav-item">
                     <a class="nav-link" href="/post/write">Write</a>
                 </li>
+                <% } %>
             </ul>
             <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item dropdown">
@@ -46,11 +48,13 @@
                         aria-labelledby="navbarDropdown"
                     >
                         <!-- 로그인 상태일때만 mypage 보이게 -->
+                        <% if (user) { %>
                         <li>
                             <a class="dropdown-item" href="/user/mypage"
                                 >Mypage</a
                             >
                         </li>
+                        <% } %>
                         <li>
                             <a class="dropdown-item" href="#">Another action</a>
                         </li>
