@@ -4,19 +4,22 @@ require('dotenv').config();
 const bcrypt = require('bcrypt');
 const saltRound = parseInt(process.env.SALT);
 const { ObjectId } = require('mongodb');
+const { isLogin, isNotLogin } = require('./middlewares');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 
 // GET 회원가입 폼
-userRouter.get('/register', async (req, res) => {
+userRouter.get('/register', isNotLogin, async (req, res, next) => {
     res.render('user/register.ejs');
 });
 
 // POST 회원가입
 // password1 == password2 체크
 // username이 동일한게 있는지 체크
-userRouter.post('/register', async (req, res) => {
+// username/password가 빈 칸인지 체크
+// username/password 길이 체크
+userRouter.post('/register', isNotLogin, async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -31,7 +34,7 @@ userRouter.post('/register', async (req, res) => {
 });
 
 // GET 로그인 폼
-userRouter.get('/login', async (req, res) => {
+userRouter.get('/login', isNotLogin, async (req, res) => {
     res.render('user/login.ejs');
 });
 
@@ -83,7 +86,7 @@ passport.deserializeUser(async (user, done) => {
 
 // POST 로그인
 // 만약 유저가 없으면 아이디가 없는거임
-userRouter.post('/login', async (req, res, next) => {
+userRouter.post('/login', isNotLogin, async (req, res, next) => {
     passport.authenticate('local', (error, user, info) => {
         if (error) {
             console.log(error);
@@ -97,6 +100,12 @@ userRouter.post('/login', async (req, res, next) => {
             res.redirect('/post/list/1');
         });
     })(req, res, next);
+});
+
+userRouter.get('/mypage', isLogin, async (req, res, next) => {
+    const user = req.user;
+
+    res.render('user/mypage.ejs', { user: user });
 });
 
 module.exports = userRouter;

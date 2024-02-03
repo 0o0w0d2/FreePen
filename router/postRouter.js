@@ -1,6 +1,7 @@
 const express = require('express');
 const postRouter = express.Router();
 const { ObjectId } = require('mongodb');
+const { isLogin } = require('./middlewares');
 
 // 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
 
@@ -49,13 +50,13 @@ postRouter.get('/list/:page', async (req, res) => {
 });
 
 // GET ) post add 페이지
-postRouter.get('/write', async (req, res) => {
+postRouter.get('/write', isLogin, async (req, res) => {
     res.render('post/write.ejs');
 });
 
 // validation 라이브러리를 설치할까?
 // POST ) post
-postRouter.post('/', async (req, res) => {
+postRouter.post('/', isLogin, async (req, res) => {
     try {
         const { title, content } = req.body;
 
@@ -117,7 +118,7 @@ postRouter.get('/:postId', async (req, res, next) => {
 });
 
 // GET ) post-edit form
-postRouter.get('/edit/:postId', async (req, res) => {
+postRouter.get('/edit/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
         const _id = new ObjectId(postId);
@@ -139,7 +140,7 @@ postRouter.get('/edit/:postId', async (req, res) => {
 });
 
 // PUT ) post 수정 (method-override lib 사용)
-postRouter.put('/:postId', async (req, res) => {
+postRouter.put('/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
 
@@ -172,7 +173,7 @@ postRouter.put('/:postId', async (req, res) => {
 });
 
 // post -> delete 로 메소드 바꾼 후에 uri 변경하기
-postRouter.delete('/:postId', async (req, res) => {
+postRouter.delete('/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
         const _id = new ObjectId(postId);
