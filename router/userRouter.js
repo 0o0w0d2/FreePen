@@ -2,12 +2,10 @@ const express = require('express');
 const userRouter = express.Router();
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const saltRound = parseInt(process.env.SALT);
-const { ObjectId } = require('mongodb');
 const { isLogin, isNotLogin } = require('./middlewares');
-const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
+
+const saltRound = parseInt(process.env.SALT);
 
 // GET 회원가입 폼
 userRouter.get('/register', isNotLogin, async (req, res, next) => {
@@ -15,73 +13,45 @@ userRouter.get('/register', isNotLogin, async (req, res, next) => {
 });
 
 // POST 회원가입
-// password1 == password2 체크
-// username이 동일한게 있는지 체크
 // username/password가 빈 칸인지 체크
 // username/password 길이 체크
-userRouter.post('/register', isNotLogin, async (req, res) => {
+userRouter.post('/register', isNotLogin, async (req, res, next) => {
     const username = req.body.username;
-    const password = req.body.password;
+    const password1 = req.body.password;
+    const password2 = req.body.passwordCheck;
 
-    const hashedPassword = await bcrypt.hash(password, saltRound);
+    try {
+        const hashedPassword = await bcrypt.hash(password1, saltRound);
 
-    await db.collection('user').insertOne({
-        username,
-        password: hashedPassword,
-    });
+        if (password1 !== password2) {
+            const error = new Error('비밀번호가 일치하지 않습니다.');
+            error.statusCode = 401;
+            throw error;
+        }
 
-    res.redirect('/user/login');
+        const user = await db.collection('user').findOne({ username });
+
+        if (user) {
+            const error = new Error('동일한 아이디가 이미 사용 중입니다.');
+            error.statusCode = 409;
+            throw error;
+        }
+
+        await db.collection('user').insertOne({
+            username,
+            password: hashedPassword,
+        });
+
+        res.redirect('/user/login');
+    } catch (err) {
+        console.log(err);
+        res.status(err.statusCode || 500).send({ message: err.message });
+    }
 });
 
 // GET 로그인 폼
-userRouter.get('/login', isNotLogin, async (req, res) => {
+userRouter.get('/login', isNotLogin, async (req, res, next) => {
     res.render('user/login.ejs');
-});
-
-// passport.authenticate('local')() => 아래 코드 수행
-// passReqToCallback을 이용해 id/pw 외 다른 것도 검증 가능
-passport.use(
-    new LocalStrategy(async (username, pw, cb) => {
-        try {
-            let user = await db
-                .collection('user')
-                .findOne({ username: username });
-            if (user) {
-                const result = await bcrypt.compare(pw, user.password);
-
-                if (result) {
-                    cb(null, user);
-                } else {
-                    cb(null, false, {
-                        message: '비밀번호가 일치하지 않습니다.',
-                    });
-                }
-            } else {
-                cb(null, false, { message: '해당 ID를 찾을 수 없습니다.' });
-            }
-        } catch (err) {
-            console.log(err);
-            cb(err);
-        }
-    }),
-);
-
-// session 만들어주는 코드
-passport.serializeUser((user, done) => {
-    process.nextTick(() => {
-        done(null, { id: user._id, username: user.username });
-    });
-});
-
-// 유저가 보낸 쿠키 분석
-passport.deserializeUser(async (user, done) => {
-    const result = await db
-        .collection('user')
-        .findOne({ _id: new ObjectId(user.id) });
-    delete result.password;
-    process.nextTick(() => {
-        done(null, result);
-    });
 });
 
 // POST 로그인
@@ -106,6 +76,12 @@ userRouter.get('/mypage', isLogin, async (req, res, next) => {
     const user = req.user;
 
     res.render('user/mypage.ejs', { user: user });
+});
+
+userRouter.get('/logout', isLogin, async (req, res, next) => {
+    req.logout();
+    req.session.destroy();
+    res.redirect('/');
 });
 
 module.exports = userRouter;

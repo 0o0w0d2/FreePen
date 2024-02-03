@@ -15,12 +15,15 @@ app.use(express.urlencoded({ extended: true }));
 
 const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
+const passportConfig = require('./passport');
+
+// passport 설정
+passportConfig();
 
 app.use(passport.initialize());
 app.use(
     session({
-        secret: process.env.SESSION,
+        secret: process.env.COOKIE_SECRET,
         resave: false,
         saveUninitialized: false,
     }),
