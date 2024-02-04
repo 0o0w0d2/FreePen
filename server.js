@@ -31,7 +31,7 @@ app.use(
         saveUninitialized: false,
         cookie: { maxAge: 1000 * 60 },
         store: MongoStore.create({
-            mongoUrl: process.env.DB_URI,
+            mongoUrl: process.env.DB_URL,
             dbName: 'forum',
         }),
     }),
@@ -61,3 +61,5 @@ app.get('/', (req, res) => {
 app.use('/post', postRouter);
 
 app.use('/user', userRouter);
+
+// error handler 추가

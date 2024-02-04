@@ -14,7 +14,7 @@ const checkLength = (name, x, max = Infinity, min = 0) => {
         const error = new Error(`${name} is too long.`);
         error.statusCode = 400;
         throw error;
-    } else if (x.length > min) {
+    } else if (x.length < min) {
         const error = new Error(`${name} is too short.`);
         error.statusCode = 400;
         throw error;

@@ -3,6 +3,7 @@ const postRouter = express.Router();
 const { ObjectId } = require('mongodb');
 const { isLogin } = require('./middlewares');
 const { isEmpty, checkLength } = require('./validateInput');
+const { upload } = require('./multer');
 
 // 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
 
@@ -57,12 +58,10 @@ postRouter.get('/write', isLogin, async (req, res) => {
 
 // validation 라이브러리를 설치할까?
 // POST ) post
-postRouter.post('/', isLogin, async (req, res, next) => {
+postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
     try {
         const { title, content } = req.body;
-
         isEmpty('title', title);
-
         checkLength('title', title, 100);
 
         const post = await db.collection('post').insertOne({
@@ -70,6 +69,7 @@ postRouter.post('/', isLogin, async (req, res, next) => {
             content,
             createdAt: new Date(),
             author: req.user._id,
+            img: req.file.location,
         });
         const postId = post.insertedId.toString();
 

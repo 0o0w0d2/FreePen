@@ -5,8 +5,18 @@
     <body>
         <%- include('../nav.ejs') %>
         <div class="mx-3 mt-3 pt-3 px-3">
-            <form action="/post" method="POST">
+            <form action="/post" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input
+                            class="form-control"
+                            type="file"
+                            id="image"
+                            name="img1"
+                            accept="image/*"
+                        />
+                    </div>
                     <label for="title" class="form-label">title</label>
                     <input
                         type="text"
