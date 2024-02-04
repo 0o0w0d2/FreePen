@@ -2,6 +2,7 @@ const express = require('express');
 const postRouter = express.Router();
 const { ObjectId } = require('mongodb');
 const { isLogin } = require('./middlewares');
+const { isEmpty, checkLength } = require('./validateInput');
 
 // 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
 
@@ -56,33 +57,25 @@ postRouter.get('/write', isLogin, async (req, res) => {
 
 // validation 라이브러리를 설치할까?
 // POST ) post
-postRouter.post('/', isLogin, async (req, res) => {
+postRouter.post('/', isLogin, async (req, res, next) => {
     try {
         const { title, content } = req.body;
 
-        // 제목이 빈 칸일 때
-        if (title == '') {
-            const error = new Error('제목이 빈 칸입니다.');
-            error.statusCode = 400;
-            throw error;
-        }
+        isEmpty('title', title);
 
-        // 제목이 100자 이상일 때 => 나중에 mongoose 사용으로 넘어가면 좋을듯(type이나 글자 수 제약이 가능하니까)
-        if (title.length >= 100) {
-            const error = new Error('제목은 100자를 넘을 수 없습니다.');
-            error.statusCode = 400;
-            throw error;
-        }
+        checkLength('title', title, 100);
 
         const post = await db.collection('post').insertOne({
             title,
             content,
             createdAt: new Date(),
+            author: req.user._id,
         });
         const postId = post.insertedId.toString();
 
         res.redirect(`/post/${postId}`);
     } catch (err) {
+        console.log(err);
         res.status(err.statusCode || 500).send({ message: err.message });
     }
 });
@@ -152,6 +145,8 @@ postRouter.put('/:postId', isLogin, async (req, res) => {
 
         const _id = new ObjectId(postId);
         const { title, content } = req.body;
+
+        checkLength('title', title, 100);
 
         const post = await db.collection('post').findOne({ _id });
 

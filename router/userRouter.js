@@ -1,11 +1,13 @@
 const express = require('express');
 const userRouter = express.Router();
-require('dotenv').config();
 const bcrypt = require('bcrypt');
-const { isLogin, isNotLogin } = require('./middlewares');
 const passport = require('passport');
+const { isLogin, isNotLogin } = require('./middlewares');
+
+const { isEmpty, checkLength } = require('./validateInput');
 
 const saltRound = parseInt(process.env.SALT);
+require('dotenv').config();
 
 // GET 회원가입 폼
 userRouter.get('/register', isNotLogin, async (req, res, next) => {
@@ -13,8 +15,6 @@ userRouter.get('/register', isNotLogin, async (req, res, next) => {
 });
 
 // POST 회원가입
-// username/password가 빈 칸인지 체크
-// username/password 길이 체크
 userRouter.post('/register', isNotLogin, async (req, res, next) => {
     const username = req.body.username;
     const password1 = req.body.password;
@@ -22,6 +22,14 @@ userRouter.post('/register', isNotLogin, async (req, res, next) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password1, saltRound);
+
+        isEmpty('ID', username);
+        isEmpty('password', password1);
+        isEmpty('password Check', password2);
+
+        checkLength('ID', username, 16, 4);
+        checkLength('password', password1, undefined, 4);
+        checkLength('password Check', password2, undefined, 4);
 
         if (password1 !== password2) {
             const error = new Error('비밀번호가 일치하지 않습니다.');
@@ -57,19 +65,29 @@ userRouter.get('/login', isNotLogin, async (req, res, next) => {
 // POST 로그인
 // 만약 유저가 없으면 아이디가 없는거임
 userRouter.post('/login', isNotLogin, async (req, res, next) => {
-    passport.authenticate('local', (error, user, info) => {
-        if (error) {
-            console.log(error);
-            return res.status(500).json(error);
-        }
-        if (!user) {
-            return res.status(401).json(info.message);
-        }
-        req.logIn(user, (err) => {
-            if (err) return next(err);
-            res.redirect('/post/list/1');
-        });
-    })(req, res, next);
+    const { username, password } = req.body;
+
+    try {
+        isEmpty('ID', username);
+        isEmpty('password', password);
+
+        passport.authenticate('local', (error, user, info) => {
+            if (error) {
+                console.log(error);
+                return res.status(500).json(error);
+            }
+            if (!user) {
+                return res.status(401).json(info.message);
+            }
+            req.logIn(user, (err) => {
+                if (err) return next(err);
+                res.redirect('/post/list/1');
+            });
+        })(req, res, next);
+    } catch (err) {
+        console.log(err);
+        res.status(err.statusCode || 500).send(err.message);
+    }
 });
 
 userRouter.get('/mypage', isLogin, async (req, res, next) => {
