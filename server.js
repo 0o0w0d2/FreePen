@@ -44,15 +44,20 @@ app.use((req, res, next) => {
     next();
 });
 
-const startServer = async () => {
-    const db = await connectToMongoDB();
-    app.locals.db = db;
-    app.listen(port, () => {
-        console.log(`Running on http://localhost:${port}`);
-    });
-};
+// server.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
+let db;
 
-startServer();
+connectToMongoDB
+    .then((client) => {
+        console.log('MongoDB connected.');
+        db = client.db('forum');
+        app.listen(port, () => {
+            console.log(`Running on http://localhost:${port}`);
+        });
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 
 app.get('/', (req, res) => {
     res.render('index.ejs');

@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = express.Router();
+const connectToMongoDB = require('../db');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { isLogin, isNotLogin } = require('./middlewares');
@@ -8,6 +9,16 @@ const { isEmpty, checkLength } = require('./validateInput');
 
 const saltRound = parseInt(process.env.SALT);
 require('dotenv').config();
+
+let db;
+
+connectToMongoDB
+    .then((client) => {
+        db = client.db('forum');
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 
 // GET 회원가입 폼
 userRouter.get('/register', isNotLogin, async (req, res, next) => {

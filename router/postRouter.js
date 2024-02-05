@@ -1,4 +1,5 @@
 const express = require('express');
+const connectToMongoDB = require('../db');
 const postRouter = express.Router();
 const { ObjectId } = require('mongodb');
 const { isLogin } = require('./middlewares');
@@ -6,6 +7,17 @@ const { isEmpty, checkLength } = require('./validateInput');
 const { upload } = require('./multer');
 
 // 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
+
+// postRouter.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
+let db;
+
+connectToMongoDB
+    .then((client) => {
+        db = client.db('forum');
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 
 postRouter.get('/list/:page', async (req, res) => {
     try {
