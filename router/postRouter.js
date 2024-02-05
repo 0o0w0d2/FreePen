@@ -64,12 +64,14 @@ postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
         isEmpty('title', title);
         checkLength('title', title, 100);
 
+        const img = req.file ? req.file.location : '';
+
         const post = await db.collection('post').insertOne({
             title,
             content,
             createdAt: new Date(),
             author: req.user._id,
-            img: req.file.location,
+            img,
         });
         const postId = post.insertedId.toString();
 
