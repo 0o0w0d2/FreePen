@@ -5,6 +5,7 @@
         <%- include('../nav.ejs') %>
         <div class="mx-3 mt-3 pt-3 px-3">
             <form action="/post/<%= post._id %>?_method=PUT" method="POST">
+                <!-- 글 수정할 때 이미지 수정? 추가해야함 -->
                 <div class="mb-3">
                     <label for="title" class="form-label">title</label>
                     <input

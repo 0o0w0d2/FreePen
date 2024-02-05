@@ -118,6 +118,12 @@ postRouter.get('/edit/:postId', isLogin, async (req, res) => {
 
         const post = await db.collection('post').findOne({ _id });
 
+        if (!post.author.equals(req.user._id)) {
+            const error = new Error('수정할 권한이 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
         if (!post) {
             const error = new Error('글을 찾을 수 없습니다.');
             error.statusCode = 404;
@@ -150,6 +156,12 @@ postRouter.put('/:postId', isLogin, async (req, res) => {
 
         const post = await db.collection('post').findOne({ _id });
 
+        if (!post.author.equals(req.user._id)) {
+            const error = new Error('수정할 권한이 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
+
         if (!post) {
             const error = new Error('글을 찾을 수 없습니다.');
             error.statusCode = 404;
@@ -174,6 +186,12 @@ postRouter.delete('/:postId', isLogin, async (req, res) => {
         const _id = new ObjectId(postId);
 
         const post = await db.collection('post').findOne({ _id });
+
+        if (!post.author.equals(req.user._id)) {
+            const error = new Error('삭제할 권한이 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
 
         if (!post) {
             const error = new Error('글을 찾을 수 없습니다.');

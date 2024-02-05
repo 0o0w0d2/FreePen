@@ -3,12 +3,12 @@
     <%- include('../head.ejs') %>
     <body>
         <%- include('../nav.ejs') %>
-
         <div class="card mx-3 mt-3">
             <h5 class="card-header">
                 <%= post.title %>
                 <!-- 버튼 위치 오른쪽으로 붙게 해야댐 -->
                 <!-- 로그인 기능 만들면 해당 사용자만 삭제/수정가능하도록 추가해야함 if문으로 -->
+                <% if (user) { %> <% if (user._id.equals(post.author)) { %>
                 <span>
                     <a
                         href="/post/edit/<%= post._id %>"
@@ -24,10 +24,13 @@
                         삭제
                     </button>
                 </span>
+                <% } %> <% } %>
             </h5>
             <img src="<%= post.img %>" class="card-img-top" alt="..." />
             <div class="card-body">
-                <p class="card-text"><%= post.content %></p>
+                <p class="card-text" style="white-space: pre-line">
+                    <%= post.content %>
+                </p>
             </div>
             <div class="card-footer">
                 <small class="text-body-secondary"><%= post.createdAt %></small>
