@@ -5,8 +5,27 @@
     <body>
         <%- include('../nav.ejs') %> <% if (postList.length == 0) { %>
         <div class="container mx-3 my-5">목록이 없습니다</div>
-        <% } %> <% for (let i = 0; i < postList.length; i++){ %>
-        <div class="card my-3 mx-3 px-2 py-2 listcard" style="max-width: 100%">
+        <% } %>
+
+        <div class="container-fluid mt-3 mb-3 ms-3">
+            <form class="d-flex" role="search">
+                <input
+                    class="form-control me-2"
+                    type="search"
+                    placeholder="Search"
+                    aria-label="Search"
+                />
+                <button class="btn btn-outline-secondary me-4" type="submit">
+                    Search
+                </button>
+            </form>
+        </div>
+
+        <% for (let i = 0; i < postList.length; i++){ %>
+        <div
+            class="card my-3 mx-4 px-3 py-3 listcard"
+            style="max-width: 100%; min-height: 370px"
+        >
             <a href="/post/<%= postList[i]._id %>" class="none">
                 <div class="row g-0">
                     <div class="col-md-4">
@@ -15,6 +34,7 @@
                             src="<%= postList[i].img %>"
                             class="img-fluid rounded-start"
                             alt="..."
+                            style="width: auto; aspect-ratio: 1"
                         />
                         <% } else { %>
                         <img
@@ -28,7 +48,8 @@
                         <div class="card-body">
                             <h5 class="card-title"><%= postList[i].title %></h5>
                             <p class="card-text" style="white-space: pre-line">
-                                <%= postList[i].content %>
+                                <% for (let j = 0; j < 8; j++) { %> <%=
+                                postList[i].content.split('\n')[j] %> <% } %>
                             </p>
                         </div>
                     </div>

@@ -4,6 +4,18 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt');
 
+const connectToMongoDB = require('../db');
+
+let db;
+
+connectToMongoDB
+    .then((client) => {
+        db = client.db('forum');
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+
 module.exports = () => {
     passport.use(
         new LocalStrategy(async (username, pw, cb) => {

@@ -3,6 +3,18 @@ const passport = require('passport');
 const local = require('./localStrategy');
 const { ObjectId } = require('mongodb');
 
+const connectToMongoDB = require('../db');
+
+let db;
+
+connectToMongoDB
+    .then((client) => {
+        db = client.db('forum');
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+
 module.exports = () => {
     passport.serializeUser((user, done) => {
         process.nextTick(() => {

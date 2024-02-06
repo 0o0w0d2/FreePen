@@ -3,8 +3,8 @@
     <%- include('../head.ejs') %>
     <body>
         <%- include('../nav.ejs') %>
-        <div class="card mx-3 mt-3">
-            <h5 class="card-header">
+        <div class="card mx-3 my-5">
+            <h4 class="card-header">
                 <%= post.title %>
                 <!-- 버튼 위치 오른쪽으로 붙게 해야댐 -->
                 <!-- 로그인 기능 만들면 해당 사용자만 삭제/수정가능하도록 추가해야함 if문으로 -->
@@ -25,11 +25,16 @@
                     </button>
                 </span>
                 <% } %> <% } %>
-            </h5>
+            </h4>
             <% if (post.img != '') { %>
-            <img src="<%= post.img %>" class="card-img-top" alt="..." />
+            <img
+                src="<%= post.img %>"
+                class="card-img-top mx-4 mt-3"
+                alt="..."
+                style="width: 60%; height: auto"
+            />
             <% } %>
-            <div class="card-body">
+            <div class="card-body mx-3 mb-4">
                 <p class="card-text" style="white-space: pre-line">
                     <%= post.content %>
                 </p>
