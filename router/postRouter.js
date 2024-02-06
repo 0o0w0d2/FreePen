@@ -220,10 +220,18 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
 // pagination X
 postRouter.get('/search', async (req, res, next) => {
     const search = req.query.value;
+    const searchRule = [
+        {
+            $search: {
+                index: 'content',
+                text: { query: search, path: ['content', 'title'] },
+            },
+        },
+    ];
 
     const postList = await db
         .collection('post')
-        .find({ $text: { $search: search } })
+        .aggregate(searchRule)
         .toArray();
 
     res.render('post/search.ejs', {
