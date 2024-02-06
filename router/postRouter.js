@@ -87,7 +87,7 @@ postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
         });
         const postId = post.insertedId.toString();
 
-        res.redirect(`/post/${postId}`);
+        res.redirect(`/post/detail/${postId}`);
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send({ message: err.message });
@@ -95,16 +95,9 @@ postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
 });
 
 // GET ) post 상세 페이지
-postRouter.get('/:postId', async (req, res, next) => {
+postRouter.get('/detail/:postId', async (req, res, next) => {
     try {
         const postId = req.params.postId;
-
-        // postId의 타입이 objectId가 아닐 때
-        if (!ObjectId.isValid(postId)) {
-            const error = new Error('올바르지 않은 postId입니다.');
-            error.statusCode = 404;
-            throw error;
-        }
 
         const _id = new ObjectId(postId);
         const post = await db.collection('post').findOne({ _id: _id });
@@ -153,7 +146,7 @@ postRouter.get('/edit/:postId', isLogin, async (req, res) => {
 });
 
 // PUT ) post 수정 (method-override lib 사용)
-postRouter.put('/:postId', isLogin, async (req, res) => {
+postRouter.put('/detail/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
 
@@ -194,7 +187,7 @@ postRouter.put('/:postId', isLogin, async (req, res) => {
 });
 
 // post -> delete 로 메소드 바꾼 후에 uri 변경하기
-postRouter.delete('/:postId', isLogin, async (req, res) => {
+postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
         const _id = new ObjectId(postId);
@@ -220,6 +213,21 @@ postRouter.delete('/:postId', isLogin, async (req, res) => {
         console.log(err);
         res.status(err.statusCode || 500).send({ message: err.message });
     }
+});
+
+postRouter.get('/search', async (req, res, next) => {
+    const search = req.query.search;
+    const regex = new RegExp(search, 'i');
+
+    const postList = await db
+        .collection('post')
+        .find({ content: { $regex: regex } })
+        .toArray();
+    console.log(postList);
+
+    res.render('post/search.ejs', {
+        postList: postList,
+    });
 });
 
 module.exports = postRouter;

@@ -50,7 +50,7 @@
                 .addEventListener('click', async function (e) {
                     try {
                         const postId = e.target.dataset.id;
-                        const response = await fetch(`/post/${postId}`, {
+                        const response = await fetch(`/post/detail/${postId}`, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
