@@ -19,6 +19,7 @@ connectToMongoDB
         console.log(err);
     });
 
+// GET ) post List ( pagination 추가 )
 postRouter.get('/list/:page', async (req, res) => {
     try {
         const page = req.params.page;
@@ -94,7 +95,7 @@ postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
     }
 });
 
-// GET ) post 상세 페이지
+// GET ) post detail
 postRouter.get('/detail/:postId', async (req, res, next) => {
     try {
         const postId = req.params.postId;
@@ -145,7 +146,7 @@ postRouter.get('/edit/:postId', isLogin, async (req, res) => {
     }
 });
 
-// PUT ) post 수정 (method-override lib 사용)
+// PUT ) post detail (method-override lib 사용)
 postRouter.put('/detail/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
@@ -186,7 +187,7 @@ postRouter.put('/detail/:postId', isLogin, async (req, res) => {
     }
 });
 
-// post -> delete 로 메소드 바꾼 후에 uri 변경하기
+// Delete ) post detail
 postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
     try {
         const postId = req.params.postId;
@@ -215,15 +216,16 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
     }
 });
 
+// GET ) search
+// pagination X
 postRouter.get('/search', async (req, res, next) => {
-    const search = req.query.search;
-    const regex = new RegExp(search, 'i');
+    const search = req.query.value;
+    console.log(search);
 
     const postList = await db
         .collection('post')
-        .find({ content: { $regex: regex } })
+        .find({ content: { $regex: search } })
         .toArray();
-    console.log(postList);
 
     res.render('post/search.ejs', {
         postList: postList,
