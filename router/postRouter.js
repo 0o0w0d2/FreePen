@@ -220,23 +220,54 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
 // pagination X
 postRouter.get('/search', async (req, res, next) => {
     const search = req.query.value;
-    const searchRule = [
-        {
-            $search: {
-                index: 'content',
-                text: { query: search, path: ['content', 'title'] },
-            },
-        },
-    ];
+    const page = req.query.page ? req.query.page : 0;
+    let searchRule;
+    console.log(page);
 
-    const postList = await db
-        .collection('post')
-        .aggregate(searchRule)
-        .toArray();
+    try {
+        if (page < 0) {
+            const error = new Error('페이지를 찾을 수 없습니다.');
+            error.statusCode = 404;
+            throw error;
+        }
 
-    res.render('post/search.ejs', {
-        postList: postList,
-    });
+        if (page == 0) {
+            searchRule = [
+                {
+                    $search: {
+                        index: 'content',
+                        text: { query: search, path: ['content', 'title'] },
+                    },
+                },
+                { $limit: 3 },
+            ];
+        } else {
+            searchRule = [
+                {
+                    $search: {
+                        index: 'content',
+                        text: { query: search, path: ['content', 'title'] },
+                    },
+                },
+                { $skip: page * 3 },
+                { $limit: 3 },
+            ];
+        }
+
+        const postList = await db
+            .collection('post')
+            .aggregate(searchRule)
+            .toArray();
+
+        res.render('post/search.ejs', {
+            postList: postList,
+            search: search,
+            page: page,
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(err.statusCode || 500).send(err.message);
+    }
 });
 
 module.exports = postRouter;
