@@ -46,19 +46,17 @@
             </div>
         </div>
         <h4 class="ms-3">Comment</h4>
-        <div class="card mx-3 my-2">
+        <% for (let i=0; i < comments.length; i++) { %>
+        <div class="card mx-3 my-3">
             <div class="card-body">
-                <h5 class="card-title">test</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">
-                    2024.02.08
-                </h6>
-                <p class="card-text">댓글 내용입니다~~</p>
+                <h5 class="card-title"><%= comments[i].authorName %></h5>
+                <p class="card-text ms-3"><%= comments[i].content %></p>
             </div>
         </div>
-        <% if (user) { %>
-        <div class="card mx-3 my-2 card-form">
+        <% } %> <% if (user) { %>
+        <div class="card mx-3 my-3 card-form">
             <div class="card-body">
-                <h5 class="card-title">test</h5>
+                <h5 class="card-title"><%= user.username %></h5>
                 <div>
                     <input
                         class="form-control comment"
@@ -84,7 +82,8 @@
                     const data = {
                         comment: comment,
                     };
-                    const response = await fetch('/post/comment', {
+                    const postId = '<%= post._id %>';
+                    const response = await fetch(`/post/comment/${postId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -115,7 +114,7 @@
 
                         // 댓글 내용
                         const commentElement = document.createElement('p');
-                        commentElement.classList.add('card-text');
+                        commentElement.classList.add('card-text', 'ms-3');
                         commentElement.textContent = comment;
 
                         // 카드 본문에 작성자과 댓글을 추가

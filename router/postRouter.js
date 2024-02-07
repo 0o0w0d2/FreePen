@@ -107,7 +107,12 @@ postRouter.get('/detail/:postId', async (req, res, next) => {
             throw error;
         }
 
-        res.render('post/detail.ejs', { post: post });
+        const comments = await db
+            .collection('comment')
+            .find({ postId: postId })
+            .toArray();
+
+        res.render('post/detail.ejs', { post: post, comments: comments });
     } catch (err) {
         console.log(err);
 
@@ -270,10 +275,33 @@ postRouter.get('/search', async (req, res, next) => {
     }
 });
 
-postRouter.post('/comment', (req, res, next) => {
-    console.log(req.body);
+// % ajax % POST ) comment
+postRouter.post('/comment/:postId', async (req, res, next) => {
+    const postId = req.params.postId;
+    const content = req.body.comment;
 
-    res.send('comment 받음');
+    try {
+        if (!req.user) {
+            const error = new Error('댓글을 작성할 권한이 없습니다.');
+            error.statusCode = 400;
+            throw error;
+        }
+        const author = req.user._id;
+        const authorName = req.user.username;
+
+        await db.collection('comment').insertOne({
+            postId,
+            author,
+            authorName,
+            content,
+            createdAt: new Date(),
+        });
+
+        res.status(201).send({ message: '댓글 작성 완료' });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err.message);
+    }
 });
 
 module.exports = postRouter;
