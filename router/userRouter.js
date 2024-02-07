@@ -92,7 +92,7 @@ userRouter.post('/login', isNotLogin, async (req, res, next) => {
             }
             req.logIn(user, (err) => {
                 if (err) return next(err);
-                res.redirect('/post/list/1');
+                res.redirect('/post/list');
             });
         })(req, res, next);
     } catch (err) {
