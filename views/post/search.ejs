@@ -60,7 +60,7 @@
 
         <nav aria-label="Page navigation">
             <ul class="pagination d-flex justify-content-center">
-                <% if ( page == 0 ) { %>
+                <% if ( page == 1 ) { %>
                 <li class="page-item previous disabled">
                     <a class="page-link" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
@@ -103,10 +103,10 @@
 
                     let currentPage = '<%= parseInt(page) %>';
 
-                    if (currentPage > 0) {
-                        currentPage--;
+                    if (currentPage > 1) {
+                        previousPage = parseInt(currentPage) - 1;
 
-                        location.href = `/post/search?value=${'<%= search %>'}&page=${currentPage}`;
+                        location.href = `/post/search?value=${'<%= search %>'}&page=${previousPage}`;
                     }
                 });
         </script>
@@ -119,13 +119,9 @@
 
                 let currentPage = '<%= parseInt(page) %>';
 
-                if (currentPage === 0) {
-                    currentPage = 1;
-                } else {
-                    currentPage++;
-                }
+                nextPage = parseInt(currentPage) + 1;
 
-                location.href = `/post/search?value=${'<%= search %>'}&page=${currentPage}`;
+                location.href = `/post/search?value=${'<%= search %>'}&page=${nextPage}`;
             });
         </script>
 

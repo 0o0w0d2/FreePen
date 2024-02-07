@@ -22,12 +22,12 @@ connectToMongoDB
 // GET ) post List ( pagination 추가 )
 
 postRouter.get('/list', async (req, res) => {
-    const page = req.query.page ? req.query.page : 0;
+    const page = req.query.page ? req.query.page : 1;
     const postCount = await db.collection('post').countDocuments();
     const maxPage = Math.ceil(postCount / 5);
 
     try {
-        if (page < 0) {
+        if (page < 1) {
             const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
@@ -44,7 +44,7 @@ postRouter.get('/list', async (req, res) => {
             .collection('post')
             .find()
             .limit(5)
-            .skip(page * 5)
+            .skip((page - 1) * 5)
             .toArray();
 
         res.render('post/list.ejs', {
@@ -213,17 +213,18 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
 // pagination X
 postRouter.get('/search', async (req, res, next) => {
     const search = req.query.value;
-    const page = req.query.page ? req.query.page : 0;
+    const page = req.query.page ? req.query.page : 1;
     let searchRule;
 
     try {
-        if (page < 0) {
+        if (page < 1) {
             const error = new Error('페이지를 찾을 수 없습니다.');
             error.statusCode = 404;
             throw error;
         }
 
-        if (page == 0) {
+        console.log('page', page);
+        if (page == 1) {
             searchRule = [
                 {
                     $search: {
@@ -241,7 +242,7 @@ postRouter.get('/search', async (req, res, next) => {
                         text: { query: search, path: ['content', 'title'] },
                     },
                 },
-                { $skip: page * 3 },
+                { $skip: (page - 1) * 3 },
                 { $limit: 3 },
             ];
         }
