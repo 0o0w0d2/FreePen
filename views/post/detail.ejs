@@ -40,13 +40,111 @@
                 </p>
             </div>
             <div class="card-footer">
-                <small class="text-body-secondary"><%= post.createdAt %></small>
+                <small class="text-body-secondary"
+                    >작성자: <%= post.authorName %></small
+                >
             </div>
         </div>
+        <h4 class="ms-3">Comment</h4>
+        <div class="card mx-3 my-2">
+            <div class="card-body">
+                <h5 class="card-title">test</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">
+                    2024.02.08
+                </h6>
+                <p class="card-text">댓글 내용입니다~~</p>
+            </div>
+        </div>
+        <% if (user) { %>
+        <div class="card mx-3 my-2 card-form">
+            <div class="card-body">
+                <h5 class="card-title">test</h5>
+                <div>
+                    <input
+                        class="form-control comment"
+                        style="width: 80%; display: inline-block"
+                    />
+                    <button
+                        class="btn btn-secondary ms-1 comment-add"
+                        style="display: inline-block"
+                    >
+                        작성
+                    </button>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <script>
+            // comment-add 버튼을 누르면 comment가 작성 -> 해야할 거 무슨 버튼 누르면 card-form이 나타나게
+            document
+                .querySelector('.comment-add')
+                .addEventListener('click', async function (e) {
+                    const comment = document.querySelector('.comment').value;
+                    const data = {
+                        comment: comment,
+                    };
+                    const response = await fetch('/post/comment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    if (response.ok) {
+                        // comment 작성 폼 없애고
+                        // const card = e.target.closest('.card-form');
+                        // card.style.display = 'none';
+
+                        // 입력한 comment 보이게 하기
+
+                        // 카드 ( card > cardBody > title, comment )
+                        const cardElement = document.createElement('div');
+                        cardElement.classList.add('card', 'mx-3', 'my-3');
+
+                        // 카드 본문
+                        const cardBodyElement = document.createElement('div');
+                        cardBodyElement.classList.add('card-body');
+
+                        // 작성자
+                        const titleElement = document.createElement('h5');
+                        titleElement.classList.add('card-title');
+                        titleElement.textContent =
+                            '<%= (user && user.username) ? user.username : "Anonymous" %>';
+
+                        // 댓글 내용
+                        const commentElement = document.createElement('p');
+                        commentElement.classList.add('card-text');
+                        commentElement.textContent = comment;
+
+                        // 카드 본문에 작성자과 댓글을 추가
+                        cardBodyElement.appendChild(titleElement);
+                        cardBodyElement.appendChild(commentElement);
+
+                        // 카드에 카드 본문을 추가
+                        cardElement.appendChild(cardBodyElement);
+
+                        // body에 추가
+                        // document.body.appendChild(cardElement);
+
+                        const cardForm = document.querySelector('.card-form');
+                        cardForm.parentNode.insertBefore(cardElement, cardForm);
+
+                        document.querySelector('.comment').value = '';
+
+                        // 댓글이 작성되고 나서 아래로 스크롤
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: 'smooth',
+                        });
+                    }
+                });
+        </script>
 
         <script>
             document
-                .querySelectorAll('.delete')[0]
+                .querySelector('.delete')
                 .addEventListener('click', async function (e) {
                     try {
                         const postId = e.target.dataset.id;
@@ -58,7 +156,7 @@
                         });
 
                         if (response.ok) {
-                            location.href = '/post/list/1';
+                            location.href = '/post/list';
                         } else {
                             console.error('삭제 실패');
                         }

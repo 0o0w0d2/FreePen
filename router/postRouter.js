@@ -33,12 +33,11 @@ postRouter.get('/list', async (req, res) => {
             throw error;
         }
 
-        // client 부분에서 처리를 못했음
-        // if (page > maxPage - 1) {
-        //     const error = new Error('찾을 수 없는 페이지입니다.');
-        //     error.statusCode = 404;
-        //     throw error;
-        // }
+        if (page > maxPage) {
+            const error = new Error('찾을 수 없는 페이지입니다.');
+            error.statusCode = 404;
+            throw error;
+        }
 
         const postList = await db
             .collection('post')
@@ -50,6 +49,7 @@ postRouter.get('/list', async (req, res) => {
         res.render('post/list.ejs', {
             postList: postList,
             page: page,
+            maxPage,
         });
     } catch (err) {
         console.log(err);
@@ -77,6 +77,10 @@ postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
             content,
             createdAt: new Date(),
             author: req.user._id,
+            // mongoDB는 입출력이 빠른게 장점이기 때문에
+            // author를 통해서 author의 username을 알아낼 수 있지만,
+            // mongodb의 장점을 살리기 위해서 비정규화 + 단순 게시판 CRUD에는 정확도가 중요하지 않음
+            authorName: req.user.username,
             img,
         });
         const postId = post.insertedId.toString();
@@ -213,6 +217,8 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
 // pagination X
 postRouter.get('/search', async (req, res, next) => {
     const search = req.query.value;
+    const postCount = await db.collection('post').countDocuments();
+    const maxPage = Math.ceil(postCount / 5);
     const page = req.query.page ? req.query.page : 1;
     let searchRule;
 
@@ -256,11 +262,18 @@ postRouter.get('/search', async (req, res, next) => {
             postList: postList,
             search: search,
             page: page,
+            maxPage,
         });
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send(err.message);
     }
+});
+
+postRouter.post('/comment', (req, res, next) => {
+    console.log(req.body);
+
+    res.send('comment 받음');
 });
 
 module.exports = postRouter;

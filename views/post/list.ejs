@@ -28,20 +28,12 @@
             <a href="/post/detail/<%= postList[i]._id %>" class="none">
                 <div class="row g-0">
                     <div class="col-md-4">
-                        <% if (postList[i].img != '') { %>
                         <img
-                            src="<%= postList[i].img %>"
+                            src="<%= postList[i].img != '' ? postList[i].img : '/pencil1.png' %>"
                             class="img-fluid rounded-start"
                             alt="..."
                             style="width: 100%; aspect-ratio: 1"
                         />
-                        <% } else { %>
-                        <img
-                            src="/pencil1.png"
-                            class="img-fluid rounded-start"
-                            alt="..."
-                        />
-                        <% } %>
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
@@ -60,20 +52,37 @@
 
         <nav aria-label="Page navigation">
             <ul class="pagination d-flex justify-content-center">
-                <% if ( page == 1 ) { %>
-                <li class="page-item previous disabled">
+                <li
+                    class="page-item previous <%= page == 1 ? 'disabled' : '' %>"
+                >
                     <a class="page-link" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                <% } else { %>
-                <li class="page-item previous">
-                    <a class="page-link" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="/post/list?page=<%= page == 1 ? 1 : parseInt(page) - 1 %>"
+                        ><%= page == 1 ? 1 : parseInt(page) - 1 %></a
+                    >
                 </li>
-                <% } %>
-                <li class="page-item next">
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="/post/list?page=<%= page == 1 ? 2 : parseInt(page) %>"
+                        ><%= page == 1 ? 2 : parseInt(page) %></a
+                    >
+                </li>
+                <li class="page-item">
+                    <a
+                        class="page-link <%= page >= maxPage ? 'disabled' : '' %>"
+                        href="/post/list?page=<%= page == 1 ? 3 : parseInt(page) + 1 %>"
+                        ><%= page == 1 ? 3 : parseInt(page) + 1%></a
+                    >
+                </li>
+                <li
+                    class="page-item next <%= page >= maxPage ? 'disabled' : '' %>"
+                >
                     <a class="page-link" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -98,16 +107,18 @@
         </script>
 
         <script>
-            // 데이터 가져와서 데이터를 바꿔치기 하는 코드를 작성하자
-            // ajax 이용해서 /post/search?value=${search}&page=?? 이런식으로 ?
             document.querySelector('.next').addEventListener('click', (e) => {
                 console.log('다음 버튼 클릭');
 
+                const maxPage = '<%= parseInt(maxPage) %>';
                 let currentPage = '<%= parseInt(page) %>';
 
-                nextPage = parseInt(currentPage) + 1;
+                // 현재 페이지가 maxPage보다 작을 때, 다음 페이지로 가는 로직
+                if (currentPage < maxPage) {
+                    nextPage = parseInt(currentPage) + 1;
 
-                location.href = `/post/list?page=${nextPage}`;
+                    location.href = `/post/list?page=${nextPage}`;
+                }
             });
         </script>
 

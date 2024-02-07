@@ -72,13 +72,19 @@
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                <% } %>
-
+                <% } %> <% if (page >= maxPage) { %>
+                <li class="page-item next disabled">
+                    <a class="page-link" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <% } else { %>
                 <li class="page-item next">
                     <a class="page-link" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
+                <% } %>
             </ul>
         </nav>
 
@@ -116,12 +122,13 @@
             // ajax 이용해서 /post/search?value=${search}&page=?? 이런식으로 ?
             document.querySelector('.next').addEventListener('click', (e) => {
                 console.log('다음 버튼 클릭');
-
+                const maxPage = '<%= parseInt(maxPage) %>';
                 let currentPage = '<%= parseInt(page) %>';
+                if (currentPage < maxPage) {
+                    nextPage = parseInt(currentPage) + 1;
 
-                nextPage = parseInt(currentPage) + 1;
-
-                location.href = `/post/search?value=${'<%= search %>'}&page=${nextPage}`;
+                    location.href = `/post/search?value=${'<%= search %>'}&page=${nextPage}`;
+                }
             });
         </script>
 
