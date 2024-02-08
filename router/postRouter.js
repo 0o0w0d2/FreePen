@@ -6,7 +6,7 @@ const { isLogin } = require('./middlewares');
 const { isEmpty, checkLength } = require('./validateInput');
 const { upload } = require('./multer');
 
-// 나중에 에러 next()로 넘겨서 처리하기 (middleware 따로 만들어서)
+// 나중에 에러 next()로 넘겨서 처리하기
 
 // postRouter.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
 let db;
@@ -20,7 +20,6 @@ connectToMongoDB
     });
 
 // GET ) post List ( pagination 추가 )
-
 postRouter.get('/list', async (req, res) => {
     const page = req.query.page ? req.query.page : 1;
     const postCount = await db.collection('post').countDocuments();
@@ -219,8 +218,7 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
     }
 });
 
-// GET ) search
-// pagination X
+// GET ) search ( pagination O / 이전 다음만 )
 postRouter.get('/search', async (req, res, next) => {
     const search = req.query.value;
     const postCount = await db.collection('post').countDocuments();
@@ -272,61 +270,6 @@ postRouter.get('/search', async (req, res, next) => {
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send(err.message);
-    }
-});
-
-// % ajax % POST ) comment
-postRouter.post('/comment/:postId', isLogin, async (req, res, next) => {
-    const postId = req.params.postId;
-    const content = req.body.comment;
-
-    try {
-        if (!req.user) {
-            const error = new Error('댓글을 작성할 권한이 없습니다.');
-            error.statusCode = 400;
-            throw error;
-        }
-        const author = req.user._id;
-        const authorName = req.user.username;
-
-        await db.collection('comment').insertOne({
-            postId,
-            author,
-            authorName,
-            content,
-            createdAt: new Date(),
-        });
-
-        res.status(201).send({ message: '댓글 작성 완료' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err.message);
-    }
-});
-
-postRouter.delete('/comment/:commentId', isLogin, async (req, res, next) => {
-    const commentId = req.params.commentId;
-
-    try {
-        const user = req.user._id;
-        const comment = await db
-            .collection('comment')
-            .findOne({ _id: new ObjectId(commentId) });
-
-        if (!user.equals(comment.author)) {
-            const error = new Error('댓글을 작성할 권한이 없습니다.');
-            error.statusCode = 400;
-            throw error;
-        }
-
-        await db
-            .collection('comment')
-            .deleteOne({ _id: new ObjectId(commentId) });
-
-        res.status(204).send({ message: '삭제 완료' });
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err.message);
     }
 });
 

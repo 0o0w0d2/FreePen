@@ -5,11 +5,10 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { isLogin, isNotLogin } = require('./middlewares');
 const { ObjectId } = require('mongodb');
-
 const { isEmpty, checkLength } = require('./validateInput');
+require('dotenv').config();
 
 const saltRound = parseInt(process.env.SALT);
-require('dotenv').config();
 
 let db;
 
@@ -21,12 +20,12 @@ connectToMongoDB
         console.log(err);
     });
 
-// GET 회원가입 폼
+// GET ) 회원가입 폼
 userRouter.get('/register', isNotLogin, async (req, res, next) => {
     res.render('user/register.ejs');
 });
 
-// POST 회원가입
+// POST ) 회원가입
 userRouter.post('/register', isNotLogin, async (req, res, next) => {
     const username = req.body.username;
     const password1 = req.body.password;
@@ -69,13 +68,12 @@ userRouter.post('/register', isNotLogin, async (req, res, next) => {
     }
 });
 
-// GET 로그인 폼
+// GET ) 로그인 폼
 userRouter.get('/login', isNotLogin, async (req, res, next) => {
     res.render('user/login.ejs');
 });
 
-// POST 로그인
-// 만약 유저가 없으면 아이디가 없는거임
+// POST ) 로그인
 userRouter.post('/login', isNotLogin, async (req, res, next) => {
     const { username, password } = req.body;
 
@@ -102,23 +100,22 @@ userRouter.post('/login', isNotLogin, async (req, res, next) => {
     }
 });
 
+// GET ) logout
+userRouter.get('/logout', isLogin, async (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err);
+        res.redirect('/');
+    });
+});
+
+// GET ) mypage
 userRouter.get('/mypage', isLogin, async (req, res, next) => {
     const user = req.user;
 
     res.render('user/mypage.ejs', { user: user });
 });
 
-userRouter.get('/logout', isLogin, async (req, res, next) => {
-    req.logout((err) => {
-        // req.session.destroy(() => { // 세션 파기 후에 콜백으로 쿠키 제거
-        //     res.clearCookie('connect.sid'); // 세션 쿠키 제거
-        //     res.redirect('/'); // 로그아웃 후 메인 페이지로 리디렉션
-        // });
-        if (err) return next(err);
-        res.redirect('/');
-    });
-});
-
+// GET ) user's page (유저가 작성한 글을 모아둔 페이지)
 userRouter.get('/post/:userId', async (req, res, next) => {
     const userId = req.params.userId;
 

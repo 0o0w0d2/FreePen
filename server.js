@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 const connectToMongoDB = require('./db');
 require('dotenv').config();
-const postRouter = require('./router/postRouter');
-const userRouter = require('./router/userRouter');
 const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 
@@ -18,11 +16,14 @@ const session = require('express-session');
 const passport = require('passport');
 const passportConfig = require('./passport');
 
+// next()로 받은 에러 처리 위해 아래 ERROR HANDLER 추가
+
 // passport 설정
 passportConfig();
 
 const port = process.env.PORT;
 
+// session 설정 코드 ( 세션을 mongodb에 저장 )
 app.use(passport.initialize());
 app.use(
     session({
@@ -59,13 +60,15 @@ connectToMongoDB
         console.log(err);
     });
 
+// GET ) index page
 app.get('/', (req, res) => {
     res.render('index.ejs');
 });
 
-app.use('/post', postRouter);
-
-app.use('/user', userRouter);
+// Router 연결
+app.use('/post', require('./router/postRouter'));
+app.use('/user', require('./router/userRouter'));
+app.use('/comment', require('./router/commentRouter'));
 
 // 모든 post 삭제
 app.get('/delete/allpost', async (req, res) => {
@@ -80,5 +83,3 @@ app.get('/delete/allcomment', async (req, res) => {
 
     res.send('allcomment 삭제 완료');
 });
-
-// error handler 추가
