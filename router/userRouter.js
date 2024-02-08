@@ -4,6 +4,7 @@ const connectToMongoDB = require('../db');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const { isLogin, isNotLogin } = require('./middlewares');
+const { ObjectId } = require('mongodb');
 
 const { isEmpty, checkLength } = require('./validateInput');
 
@@ -116,6 +117,22 @@ userRouter.get('/logout', isLogin, async (req, res, next) => {
         if (err) return next(err);
         res.redirect('/');
     });
+});
+
+userRouter.get('/post/:userId', async (req, res, next) => {
+    const userId = req.params.userId;
+
+    try {
+        const userpost = await db
+            .collection('post')
+            .find({ author: new ObjectId(userId) })
+            .toArray();
+
+        res.render('user/postlist.ejs', { postList: userpost });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err.message);
+    }
 });
 
 module.exports = userRouter;

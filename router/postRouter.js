@@ -33,7 +33,8 @@ postRouter.get('/list', async (req, res) => {
             throw error;
         }
 
-        if (page > maxPage) {
+        // post가 없을 경우 제외하고 (page=1이 post가 없을 경우도 포함)
+        if (page != 1 && page > maxPage) {
             const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
@@ -182,7 +183,7 @@ postRouter.put('/detail/:postId', isLogin, async (req, res) => {
             .collection('post')
             .updateOne({ _id }, { $set: { title, content } });
 
-        res.redirect(`/post/${postId}`);
+        res.redirect(`/post/detail/${postId}`);
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send({ message: err.message });
@@ -234,7 +235,6 @@ postRouter.get('/search', async (req, res, next) => {
             throw error;
         }
 
-        console.log('page', page);
         if (page == 1) {
             searchRule = [
                 {

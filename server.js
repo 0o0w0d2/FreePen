@@ -29,7 +29,7 @@ app.use(
         secret: process.env.COOKIE_SECRET,
         resave: false,
         saveUninitialized: false,
-        cookie: { maxAge: 1000 * 60 },
+        cookie: { maxAge: 1000 * 60 * 60 },
         store: MongoStore.create({
             mongoUrl: process.env.DB_URL,
             dbName: 'forum',
@@ -66,5 +66,19 @@ app.get('/', (req, res) => {
 app.use('/post', postRouter);
 
 app.use('/user', userRouter);
+
+// 모든 post 삭제
+app.get('/delete/allpost', async (req, res) => {
+    await db.collection('post').deleteMany();
+
+    res.send('allpost 삭제 완료');
+});
+
+// 모든 댓글 삭제
+app.get('/delete/allcomment', async (req, res) => {
+    await db.collection('comment').deleteMany();
+
+    res.send('allcomment 삭제 완료');
+});
 
 // error handler 추가

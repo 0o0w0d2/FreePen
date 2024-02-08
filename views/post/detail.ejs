@@ -41,7 +41,12 @@
             </div>
             <div class="card-footer">
                 <small class="text-body-secondary"
-                    >작성자: <%= post.authorName %></small
+                    >작성자:
+                    <a
+                        href="/user/post/<%= post.author %>"
+                        style="text-decoration: none; color: inherit"
+                        ><%= post.authorName %></a
+                    ></small
                 >
             </div>
         </div>
@@ -49,7 +54,13 @@
         <% for (let i=0; i < comments.length; i++) { %>
         <div class="card mx-3 my-3">
             <div class="card-body">
-                <h5 class="card-title"><%= comments[i].authorName %></h5>
+                <h5 class="card-title">
+                    <a
+                        href="/user/post/<%= comments[i].author %>"
+                        style="text-decoration: none; color: inherit"
+                        ><%= comments[i].authorName %></a
+                    >
+                </h5>
                 <p class="card-text ms-3"><%= comments[i].content %></p>
             </div>
         </div>
