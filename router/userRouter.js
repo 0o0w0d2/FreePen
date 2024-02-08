@@ -125,7 +125,14 @@ userRouter.get('/post/:userId', async (req, res, next) => {
             .find({ author: new ObjectId(userId) })
             .toArray();
 
-        res.render('user/postlist.ejs', { postList: userpost });
+        const author = await db
+            .collection('user')
+            .findOne({ _id: new ObjectId(userId) });
+
+        res.render('user/postlist.ejs', {
+            postList: userpost,
+            author,
+        });
     } catch (err) {
         console.log(err);
         res.status(500).send(err.message);
