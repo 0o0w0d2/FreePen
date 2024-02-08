@@ -51,8 +51,10 @@
             </div>
         </div>
         <h4 class="ms-3">Comment</h4>
-        <% for (let i=0; i < comments.length; i++) { %>
-        <div class="card mx-3 my-3">
+        <% if (comments.length == 0) { %>
+        <div class="container my-5">댓글이 없습니다.</div>
+        <% } %> <% for (let i=0; i < comments.length; i++) { %>
+        <div class="card mx-3 my-3 commentcard">
             <div class="card-body">
                 <h5 class="card-title">
                     <a
@@ -61,7 +63,16 @@
                         ><%= comments[i].authorName %></a
                     >
                 </h5>
-                <p class="card-text ms-3"><%= comments[i].content %></p>
+                <span class="card-text ms-3"><%= comments[i].content %></span>
+                <% if (user._id.equals(comments[i].author)) { %>
+                <button
+                    class="comment-del btn btn-sm btn-outline-danger"
+                    style="float: right"
+                    data-id="<%= comments[i]._id %>"
+                >
+                    삭제
+                </button>
+                <% } %>
             </div>
         </div>
         <% } %> <% if (user) { %>
@@ -85,6 +96,42 @@
         <% } %>
 
         <script>
+            for (let i = 0; i < parseInt('<%= comments.length %>'); i++) {
+                document
+                    .querySelectorAll('.comment-del')
+                    [i].addEventListener('click', async function (e) {
+                        try {
+                            const commentId = e.target.dataset.id;
+
+                            // 삭제 버튼을 누르면 그 데이터가 담긴 card 안보이게
+                            const commentCard =
+                                e.target.closest('.commentcard');
+                            commentCard.style.display = 'none';
+
+                            // db에서 데이터를 삭제하기 위해서 commentId를 fetch를 이용해서 보내기
+                            // 새로 단 댓글에 대해서 삭제 버튼이 활성화되지 않는 문제 해결해야 함
+                            const response = await fetch(
+                                `/post/comment/${commentId}`,
+                                {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                },
+                            );
+                            if (response.ok) {
+                                console.log('댓글 삭제 완료');
+                            } else {
+                                console.error('삭제 실패');
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    });
+            }
+        </script>
+
+        <script>
             // comment-add 버튼을 누르면 comment가 작성 -> 해야할 거 무슨 버튼 누르면 card-form이 나타나게
             document
                 .querySelector('.comment-add')
@@ -102,6 +149,7 @@
                         body: JSON.stringify(data),
                     });
 
+                    // 새로 단 댓글에 대해서 삭제 버튼이 활성화되지 않는 문제 해결해야 함
                     if (response.ok) {
                         // comment 작성 폼 없애고
                         // const card = e.target.closest('.card-form');
@@ -124,13 +172,26 @@
                             '<%= (user && user.username) ? user.username : "Anonymous" %>';
 
                         // 댓글 내용
-                        const commentElement = document.createElement('p');
+                        const commentElement = document.createElement('span');
                         commentElement.classList.add('card-text', 'ms-3');
                         commentElement.textContent = comment;
+
+                        // 삭제 버튼
+                        const commentDelElement =
+                            document.createElement('button');
+                        commentDelElement.classList.add(
+                            'comment-del',
+                            'btn',
+                            'btn-sm',
+                            'btn-outline-danger',
+                        );
+                        commentDelElement.style.float = 'right';
+                        commentDelElement.textContent = '삭제';
 
                         // 카드 본문에 작성자과 댓글을 추가
                         cardBodyElement.appendChild(titleElement);
                         cardBodyElement.appendChild(commentElement);
+                        cardBodyElement.appendChild(commentDelElement);
 
                         // 카드에 카드 본문을 추가
                         cardElement.appendChild(cardBodyElement);
