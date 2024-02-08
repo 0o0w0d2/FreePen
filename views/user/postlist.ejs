@@ -6,7 +6,9 @@
         <%- include('../nav.ejs') %>
         <div class="ms-4 mt-3">
             <h3><%= postList[0].authorName %>의 페이지</h3>
-            <a type="button" class="btn btn-secondary mt-2">채팅창</a>
+            <% if (user && !user._id.equals(postList[0].author) ) { %>
+            <a type="button" class="btn btn-secondary mt-2">채팅하기</a>
+            <% } %>
         </div>
 
         <% if (postList.length == 0) { %>

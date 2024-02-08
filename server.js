@@ -69,6 +69,7 @@ app.get('/', (req, res) => {
 app.use('/post', require('./router/postRouter'));
 app.use('/user', require('./router/userRouter'));
 app.use('/comment', require('./router/commentRouter'));
+app.use('/chat', require('./router/chatRouter'));
 
 // 모든 post 삭제
 app.get('/delete/allpost', async (req, res) => {

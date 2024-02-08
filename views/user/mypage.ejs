@@ -6,13 +6,21 @@
         <%- include('../nav.ejs') %>
         <div class="ms-4 mt-3">
             <h3>나의 마이페이지</h3>
-            <a type="button" class="btn btn-secondary mt-2">채팅창</a>
+            <a type="button" class="btn btn-secondary mt-2" href="/chat/list"
+                >채팅창</a
+            >
             <a
                 href="/user/post/<%= user._id %>"
                 class="ms-2"
                 style="text-decoration: none"
                 >작성 글 목록 보기</a
             >
+            <a class="icon-link" href="#">
+                Icon link
+                <svg class="bi" aria-hidden="true">
+                    <use xlink:href="#arrow-right"></use>
+                </svg>
+            </a>
         </div>
 
         <script
