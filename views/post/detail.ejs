@@ -3,28 +3,29 @@
     <%- include('../head.ejs') %>
     <body>
         <%- include('../nav.ejs') %>
-        <div class="card mx-3 my-5">
-            <h4 class="card-header">
-                <%= post.title %>
-                <!-- 버튼 위치 오른쪽으로 붙게 해야 됨 -->
-                <% if (user) { %> <% if (user._id.equals(post.author)) { %>
-                <span>
-                    <a
-                        href="/post/edit/<%= post._id %>"
-                        type="button"
-                        class="btn btn-sm btn-outline-primary"
-                    >
-                        수정</a
-                    >
-                    <button
-                        class="btn btn-sm btn-outline-danger delete"
-                        data-id="<%= post._id %>"
-                    >
-                        삭제
-                    </button>
-                </span>
-                <% } %> <% } %>
-            </h4>
+        <!-- 버튼 위치 오른쪽으로 붙게 해야 됨 -->
+        <% if (user && user._id.equals(post.author)) { %>
+        <div class="ms-3 mt-3 mb-3">
+            <a
+                href="/post/edit/<%= post._id %>"
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+            >
+                수정</a
+            >
+            <button
+                class="btn btn-sm btn-outline-danger delete"
+                data-id="<%= post._id %>"
+            >
+                삭제
+            </button>
+        </div>
+        <% } %>
+
+        <div
+            class="card mx-3 <%= user && user._id.equals(post.author) ? 'my-2' : 'my-5' %>"
+        >
+            <h4 class="card-header"><%= post.title %></h4>
             <% if (post.img != '') { %>
             <img
                 src="<%= post.img %>"
@@ -49,7 +50,7 @@
                 >
             </div>
         </div>
-        <h4 class="ms-3">Comment</h4>
+        <h4 class="ms-3 mt-5">Comment</h4>
         <% if (comments.length == 0) { %>
         <div class="container my-5 no-reply">댓글이 없습니다.</div>
         <% } %> <% for (let i=0; i < comments.length; i++) { %>
@@ -82,10 +83,10 @@
                 <div>
                     <input
                         class="form-control comment"
-                        style="width: 85%; display: inline-block"
+                        style="width: 75%; display: inline-block"
                     />
                     <button
-                        class="btn btn-secondary ms-1 comment-add"
+                        class="btn btn-secondary comment-add"
                         style="display: inline-block"
                     >
                         작성

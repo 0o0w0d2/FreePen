@@ -116,7 +116,7 @@ userRouter.get('/mypage', isLogin, async (req, res, next) => {
 });
 
 // GET ) user's page (유저가 작성한 글을 모아둔 페이지)
-userRouter.get('/post/:userId', async (req, res, next) => {
+userRouter.get('/post/:userId', isLogin, async (req, res, next) => {
     const userId = req.params.userId;
 
     try {

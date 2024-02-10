@@ -5,30 +5,47 @@
     <body>
         <%- include('../nav.ejs') %>
         <div class="ms-4 mt-3">
-            <h3>누구와의 채팅</h3>
+            <h3>
+                <%= chatroom.memberName[0] == user.username ?
+                chatroom.memberName[1] : chatroom.memberName[0] %>와의 채팅
+            </h3>
         </div>
-        <div class="mt-3">
-            <div
-                class="card my-2 ms-3 px-3 py-3 yourchat"
-                style="min-width: 50%; max-width: 70%"
-            >
-                <h5 class="card-title">배쪼쪼</h5>
-                <p class="card-text">오늘 하루 어땠어?</p>
-            </div>
+        <div class="chatting">
+            <div class="mt-3">
+                <div
+                    class="card my-2 ms-4 px-3 py-3 yourchat"
+                    style="min-width: 50%; max-width: 70%"
+                >
+                    <h5 class="card-title">
+                        <%= chatroom.memberName[0] == user.username ?
+                        chatroom.memberName[1] : chatroom.memberName[0] %>
+                    </h5>
+                    <p class="card-text">오늘 하루 어땠어?</p>
+                </div>
+                <div
+                    class="card my-2 me-4 px-3 py-3 bg-secondary-subtle mychat"
+                    style="min-width: 50%; max-width: 70%; float: right"
+                >
+                    <h5 class="card-title"><%= user.username %></h5>
+                    <p class="card-text">난 너무 좋았어.</p>
+                </div>
 
-            <div
-                class="card my-2 me-3 px-3 py-3 bg-secondary-subtle mychat"
-                style="min-width: 50%; max-width: 70%; float: right"
-            >
-                <h5 class="card-title">나</h5>
-                <p class="card-text">오늘 하루 어땠어?</p>
+                <div
+                    class="card my-2 me-4 px-3 py-3 bg-secondary-subtle mychat"
+                    style="min-width: 50%; max-width: 70%; float: right"
+                >
+                    <h5 class="card-title"><%= user.username %></h5>
+                    <p class="card-text">너는 오늘 하루 어땠어?</p>
+                </div>
             </div>
+            <!-- 채팅창 아래 부분이 가려지는 문제 해결을 위해 빈 div 추가 -->
+            <div class="mt-3" style="clear: both; height: 50px"></div>
 
             <div class="fixed-bottom bg-white" style="width: 100%">
-                <div class="ms-3" style="text-align: center">
+                <div class="ms-3" style="text-align: center; display: block">
                     <input
                         class="form-control"
-                        style="width: 85%; display: inline-block"
+                        style="width: 80%; display: inline-block"
                     />
                     <button
                         class="btn btn-secondary mx-1 my-2 chat-add"
