@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo');
 const { ObjectId } = require('mongodb');
 
 const { createServer } = require('http');
+const server = createServer(app);
 const { Server } = require('socket.io');
 
 app.use(methodOverride('_method'));
@@ -21,14 +22,12 @@ const session = require('express-session');
 const passport = require('passport');
 const passportConfig = require('./utils/passport');
 
-// const socketChatConfig = require('./utils/socket-chat-handler');
+const socketChatConfig = require('./utils/socket-chat-handler');
 
 // next()로 받은 에러 처리 위해 아래 ERROR HANDLER 추가
 
 // passport 설정
 passportConfig();
-
-// socketChatConfig();
 
 const port = process.env.PORT;
 
@@ -55,31 +54,9 @@ app.use((req, res, next) => {
 });
 
 // websocket 코드
-const server = createServer(app); // HTTP 서버 생성
 const io = new Server(server); // websocket 서버 생성
 
-io.on('connection', (socket) => {
-    console.log('websocket 연결됨');
-
-    socket.on('room-join', async (data) => {
-        console.log('room Id :', data);
-        socket.join(data);
-    });
-
-    socket.on('msg', async (data) => {
-        await db.collection('chat').insertOne({
-            roomId: new ObjectId(data.room),
-            msg: data.msg,
-            author: new ObjectId(data.author),
-            createdAt: new Date(),
-        });
-
-        io.to(data.room).emit('msg', {
-            msg: data.msg,
-            author: data.author,
-        });
-    });
-});
+socketChatConfig(io);
 
 // server.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
 let db;
