@@ -3,7 +3,7 @@ const passport = require('passport');
 const local = require('./localStrategy');
 const { ObjectId } = require('mongodb');
 
-const connectToMongoDB = require('../db');
+const connectToMongoDB = require('../../db');
 
 let db;
 

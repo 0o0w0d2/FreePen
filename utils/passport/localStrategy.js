@@ -4,7 +4,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt');
 
-const connectToMongoDB = require('../db');
+const connectToMongoDB = require('../../db');
 
 let db;
 

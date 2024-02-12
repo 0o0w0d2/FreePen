@@ -17,12 +17,16 @@ app.use(express.urlencoded({ extended: true }));
 
 const session = require('express-session');
 const passport = require('passport');
-const passportConfig = require('./passport');
+const passportConfig = require('./utils/passport');
+
+// const socketChatConfig = require('./utils/socket-chat-handler');
 
 // next()로 받은 에러 처리 위해 아래 ERROR HANDLER 추가
 
 // passport 설정
 passportConfig();
+
+// socketChatConfig();
 
 const port = process.env.PORT;
 
@@ -74,15 +78,6 @@ io.on('connection', (socket) => {
         });
     });
 });
-
-// 채팅 상세 페이지를 들어가면 ejs에서 socket.emit('ask-join', 룸이름)을 이용해
-// 'ask-join'이라는 키워드로 룸에 join 시킴
-// server에서 socket.on('ask-join', async (data) => { socket.join(data) })
-
-// ejs에서 메시지를 보낼 때 socket.emit('message', { msg: '보낼 메시지', room: 룸이름 })
-// 'message'라는 키워드로 메시지를 받으면 룸이름인 룸에 전송
-// server에서 특정 룸에 데이터를 보내고 싶으면 io.to(특정룸).emit()
-// 위와 같을 때는 socket.on('message', async (data) => {io.to(data.room).emit('작명', data.msg)})
 
 // server.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
 let db;

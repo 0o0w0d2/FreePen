@@ -19,9 +19,11 @@
                 <div class="row g-0">
                     <div class="col-md-8">
                         <h5 class="card-title">
-                            <%= chatList[i].memberName %>
+                            <%= chatList[i].memberName[0] == user.username ?
+                            chatList[i].memberName[1] :
+                            chatList[i].memberName[0] %>
                         </h5>
-                        <p class="card-text">최근 채팅 내용입니다.</p>
+                        <p class="card-text">dd</p>
                     </div>
                 </div>
             </a>

@@ -24,7 +24,18 @@ chatRotuer.get('/list', isLogin, async (req, res, next) => {
         })
         .toArray();
 
-    res.render('chat/chatList.ejs', { chatList: chatList });
+    let recentchat;
+    for (let i = 0; i < chatList.length; i++) {
+        console.log(chatList[i]._id);
+        chat = await db
+            .collection('chat')
+            .find({ roomId: chatList[i]._id })
+            .toArray();
+
+        console.log('이거', chat);
+    }
+
+    res.render('chat/chatList.ejs', { chatList: chatList, recentchat });
 });
 
 // postlist의 채팅하기 버튼을 누르면 채팅방을 생성

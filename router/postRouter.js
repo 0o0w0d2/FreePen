@@ -4,7 +4,7 @@ const postRouter = express.Router();
 const { ObjectId } = require('mongodb');
 const { isLogin } = require('./middlewares');
 const { isEmpty, checkLength } = require('./validateInput');
-const { upload } = require('./multer');
+const { upload } = require('../utils/multer');
 
 // 나중에 에러 next()로 넘겨서 처리하기
 
