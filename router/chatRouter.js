@@ -24,16 +24,17 @@ chatRotuer.get('/list', isLogin, async (req, res, next) => {
         })
         .toArray();
 
-    let recentchat;
+    // 최근 채팅 하나 가져오기
+    let recentchat = [];
     for (let i = 0; i < chatList.length; i++) {
-        console.log(chatList[i]._id);
-        chat = await db
+        const chat = await db
             .collection('chat')
-            .find({ roomId: chatList[i]._id })
-            .toArray();
+            .findOne({ roomId: chatList[i]._id }, { sort: { _id: -1 } });
 
-        console.log('이거', chat);
+        recentchat.push(chat ? chat.msg : '');
     }
+
+    console.log(recentchat);
 
     res.render('chat/chatList.ejs', { chatList: chatList, recentchat });
 });
@@ -89,7 +90,7 @@ chatRotuer.get('/:roomId', isLogin, async (req, res, next) => {
         const chat = await db
             .collection('chat')
             .find({
-                roomId: chatroomId,
+                roomId: new ObjectId(chatroomId),
             })
             .sort({ createdAt: -1 })
             .limit(10)

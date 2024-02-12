@@ -5,6 +5,8 @@ require('dotenv').config();
 const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 
+const { ObjectId } = require('mongodb');
+
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 
@@ -66,9 +68,9 @@ io.on('connection', (socket) => {
 
     socket.on('msg', async (data) => {
         await db.collection('chat').insertOne({
-            roomId: data.room,
+            roomId: new ObjectId(data.room),
             msg: data.msg,
-            author: data.author,
+            author: new ObjectId(data.author),
             createdAt: new Date(),
         });
 
