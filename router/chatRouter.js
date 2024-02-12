@@ -80,6 +80,8 @@ chatRotuer.get('/:roomId', isLogin, async (req, res, next) => {
             .find({
                 roomId: chatroomId,
             })
+            .sort({ createdAt: -1 })
+            .limit(10)
             .toArray();
 
         // ObjectId 형태로 includes 적용이 안되는 문제로 toString()를 이용해 변환
@@ -91,7 +93,10 @@ chatRotuer.get('/:roomId', isLogin, async (req, res, next) => {
             throw error;
         }
 
-        res.render('chat/chat.ejs', { chatroom: chatroom, chat: chat });
+        res.render('chat/chat.ejs', {
+            chatroom: chatroom,
+            chat: chat.reverse(),
+        });
     } catch (err) {
         console.log(err);
         res.status(err.statusCode || 500).send(err.message);
