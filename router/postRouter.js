@@ -109,7 +109,7 @@ postRouter.get('/detail/:postId', async (req, res, next) => {
 
         const comments = await db
             .collection('comment')
-            .find({ postId: postId })
+            .find({ postId: new ObjectId(postId) })
             .toArray();
 
         res.render('post/detail.ejs', { post: post, comments: comments });

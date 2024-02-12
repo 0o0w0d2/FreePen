@@ -29,7 +29,7 @@ commentRouter.post('/:postId', isLogin, async (req, res, next) => {
         const authorName = req.user.username;
 
         await db.collection('comment').insertOne({
-            postId,
+            postId: new ObjectId(postId),
             author,
             authorName,
             content,
