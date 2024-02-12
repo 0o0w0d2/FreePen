@@ -70,7 +70,7 @@
 
                     if (response.ok) {
                         const chatroomId = await response.json(); // 서버에서 보낸 데이터를 JSON 형식으로 파싱하여 받아옴
-                        console.log('Received chatroom ID:', chatroomId);
+                        console.log('chatroomID : ', chatroomId);
 
                         location.href = `/chat/${chatroomId}`;
                     }

@@ -5,6 +5,9 @@ require('dotenv').config();
 const methodOverride = require('method-override');
 const MongoStore = require('connect-mongo');
 
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+
 app.use(methodOverride('_method'));
 
 app.use(express.static(__dirname + '/public'));
@@ -45,6 +48,42 @@ app.use((req, res, next) => {
     next();
 });
 
+// websocket 코드
+const server = createServer(app); // HTTP 서버 생성
+const io = new Server(server); // websocket 서버 생성
+
+io.on('connection', (socket) => {
+    console.log('websocket 연결됨');
+
+    socket.on('room-join', async (data) => {
+        console.log('room Id :', data);
+        socket.join(data);
+    });
+
+    socket.on('msg', async (data) => {
+        await db.collection('chat').insertOne({
+            roomId: data.room,
+            msg: data.msg,
+            author: data.author,
+            createdAt: new Date(),
+        });
+
+        io.to(data.room).emit('msg', {
+            msg: data.msg,
+            author: data.author,
+        });
+    });
+});
+
+// 채팅 상세 페이지를 들어가면 ejs에서 socket.emit('ask-join', 룸이름)을 이용해
+// 'ask-join'이라는 키워드로 룸에 join 시킴
+// server에서 socket.on('ask-join', async (data) => { socket.join(data) })
+
+// ejs에서 메시지를 보낼 때 socket.emit('message', { msg: '보낼 메시지', room: 룸이름 })
+// 'message'라는 키워드로 메시지를 받으면 룸이름인 룸에 전송
+// server에서 특정 룸에 데이터를 보내고 싶으면 io.to(특정룸).emit()
+// 위와 같을 때는 socket.on('message', async (data) => {io.to(data.room).emit('작명', data.msg)})
+
 // server.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
 let db;
 
@@ -52,7 +91,8 @@ connectToMongoDB
     .then((client) => {
         console.log('MongoDB connected.');
         db = client.db('forum');
-        app.listen(port, () => {
+        // HTTP 서버를 express와 websocket이 공유
+        server.listen(port, () => {
             console.log(`Running on http://localhost:${port}`);
         });
     })
@@ -70,17 +110,3 @@ app.use('/post', require('./router/postRouter'));
 app.use('/user', require('./router/userRouter'));
 app.use('/comment', require('./router/commentRouter'));
 app.use('/chat', require('./router/chatRouter'));
-
-// 모든 post 삭제
-app.get('/delete/allpost', async (req, res) => {
-    await db.collection('post').deleteMany();
-
-    res.send('allpost 삭제 완료');
-});
-
-// 모든 댓글 삭제
-app.get('/delete/allcomment', async (req, res) => {
-    await db.collection('comment').deleteMany();
-
-    res.send('allcomment 삭제 완료');
-});
