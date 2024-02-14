@@ -121,57 +121,24 @@
             if (noReply) {
               noReply.style.display = 'none';
             }
-            // 새로 단 댓글에 대해서 삭제 버튼이 활성화되지 않는 문제 해결해야 함
-            // 입력한 comment 보이게 하기 ( card > cardBody > author, comment, button )
+            // % 새로 단 댓글에 대해서 삭제 버튼이 활성화되지 않는 문제 해결해야 함 %
+            // 입력한 comment 보이게 하기
 
-            // card 생성
-            const cardElement = document.createElement('div');
-            cardElement.classList.add('card', 'mx-3', 'my-3');
-
-            // cardBody 생성
-            const cardBodyElement =
-              document.createElement('div');
-            cardBodyElement.classList.add('card-body');
-
-            // author 생성
-            const authorElement = document.createElement('h5');
-            authorElement.classList.add('card-title');
-            authorElement.textContent =
-              '<%= (user && user.username) ? user.username : "Anonymous" %>';
-
-            // comment 생성
-            const commentElement =
-              document.createElement('span');
-            commentElement.classList.add('card-text', 'ms-3');
-            commentElement.textContent = comment;
-
-            // del button 생성
-            const commentDelElement =
-              document.createElement('button');
-            commentDelElement.classList.add(
-              'comment-del',
-              'btn',
-              'btn-sm',
-              'btn-outline-danger',
-            );
-            commentDelElement.style.float = 'right';
-            commentDelElement.textContent = '삭제';
-
-            // 카드 본문에 작성자과 댓글을 추가
-            cardBodyElement.appendChild(authorElement);
-            cardBodyElement.appendChild(commentElement);
-            cardBodyElement.appendChild(commentDelElement);
-
-            // 카드에 카드 본문을 추가
-            cardElement.appendChild(cardBodyElement);
-
-            // card-form( 댓글 생성 폼 ) 위에 작성한 cardElement 추가
+            // card-form( 댓글 생성 폼 ) 위에 댓글 추가
             const cardForm =
               document.querySelector('.card-form');
-            cardForm.parentNode.insertBefore(
-              cardElement,
-              cardForm,
-            );
+            cardForm.insertAdjacentHTML('beforebegin', `<div class="card mx-3 my-3 commentcard">
+    <div class="card-body">
+      <h5 class="card-title">
+        <a href="/user/post/<%= (user && user.username) ? user.username : "Anonymous" %>" style="text-decoration: none; color: inherit"><%= (user && user.username) ? user.username : "Anonymous" %></a>
+      </h5>
+      <span class="card-text ms-3">${comment}</span>
+      
+      <button class="comment-del btn btn-sm btn-outline-danger" style="float: right">
+        삭제
+      </button>
+    </div>
+    </div>`)
 
             document.querySelector('.comment').value = '';
 
