@@ -18,7 +18,7 @@
   <div class="card mx-3 <%= user && user._id.equals(post.author) ? 'my-2' : 'my-5' %>">
     <h4 class="card-header"><%= post.title %></h4>
     <% if (post.img != '') { %>
-    <img src="<%= post.img %>" class="card-img-top mx-4 mt-3" alt="..." style="width: 60%; height: auto" />
+    <img src="<%= post.img %>" class="card-img-top mx-4 mt-3" alt="유저가 등록한 post 사진" style="width: 60%; height: auto" />
     <% } %>
     <div class="card-body mx-3 mb-4">
       <p class="card-text" style="white-space: pre-line">

@@ -27,29 +27,54 @@ module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log('websocket 연결됨');
 
-        const author = socket.request.session.passport.user.id;
-
         socket.on('room-join', async (data) => {
-            console.log('room Id :', data);
-            // 자신이 속해있는 room에만 들어갈 수 있도록
-            socket.join(data);
+            try {
+                console.log('room Id :', data);
+
+                const author = socket.request.session.passport.user.id;
+
+                const chatroom = await db
+                    .collection('chatroom')
+                    .findOne({ _id: new ObjectId(data) });
+
+                let roomCheck = false;
+
+                for (let i = 0; i < chatroom.member.length; i++) {
+                    if (chatroom.member[i].equals(new ObjectId(author))) {
+                        roomCheck = true;
+                    }
+                }
+
+                if (!roomCheck) {
+                    throw new Error('채팅방에 접근할 수 없습니다.');
+                }
+
+                socket.join(data);
+            } catch (err) {
+                console.log(err);
+            }
         });
 
         socket.on('msg-client', async (data) => {
-            console.log('클라이언트가 보낸 data', data);
+            try {
+                console.log('클라이언트가 보낸 data', data);
 
-            await db.collection('chat').insertOne({
-                roomId: new ObjectId(data.room),
-                msg: data.msg,
-                author: new ObjectId(author),
-                createdAt: new Date(),
-            });
+                const author = socket.request.session.passport.user.id;
 
-            io.to(data.room).emit('msg-server', {
-                msg: data.msg,
-                // 댓글 작성자를 보내야, 댓글 작성자를 비교할 수 있지 않나?
-                author: author,
-            });
+                await db.collection('chat').insertOne({
+                    roomId: new ObjectId(data.room),
+                    msg: data.msg,
+                    author: new ObjectId(author),
+                    createdAt: new Date(),
+                });
+
+                io.to(data.room).emit('msg-server', {
+                    msg: data.msg,
+                    author: author,
+                });
+            } catch (err) {
+                console.log(err);
+            }
         });
     });
 };
