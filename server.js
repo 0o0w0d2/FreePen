@@ -32,19 +32,19 @@ passportConfig();
 const port = process.env.PORT;
 
 // session 설정 코드 ( 세션을 mongodb에 저장 )
-app.use(passport.initialize());
-app.use(
-    session({
-        secret: process.env.COOKIE_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: { maxAge: 1000 * 60 * 60 },
-        store: MongoStore.create({
-            mongoUrl: process.env.DB_URL,
-            dbName: 'forum',
-        }),
+const sessionMiddleware = session({
+    secret: process.env.COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 },
+    store: MongoStore.create({
+        mongoUrl: process.env.DB_URL,
+        dbName: 'forum',
     }),
-);
+});
+
+app.use(passport.initialize());
+app.use(sessionMiddleware);
 app.use(passport.session());
 
 // 전역 middleware를 이용해 모든 템플릿에서 'user' 변수 사용할 수 있게 설정
@@ -53,10 +53,15 @@ app.use((req, res, next) => {
     next();
 });
 
+// session.request
+
 // websocket 코드
 const io = new Server(server); // websocket 서버 생성
 
 socketChatConfig(io);
+
+// session을 socket.io에서 사용할 수 있도록 설정
+io.engine.use(sessionMiddleware);
 
 // server.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
 let db;

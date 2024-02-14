@@ -27,6 +27,8 @@ module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log('websocket 연결됨');
 
+        const author = socket.request.session.passport.user.id;
+
         socket.on('room-join', async (data) => {
             console.log('room Id :', data);
             socket.join(data);
@@ -34,10 +36,11 @@ module.exports = (io) => {
 
         socket.on('msg', async (data) => {
             console.log('클라이언트가 보낸 data', data);
+
             await db.collection('chat').insertOne({
                 roomId: new ObjectId(data.room),
                 msg: data.msg,
-                author: new ObjectId(data.author),
+                author: new ObjectId(author),
                 createdAt: new Date(),
             });
 

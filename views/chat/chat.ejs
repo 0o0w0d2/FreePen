@@ -64,7 +64,6 @@
         await socket.emit('msg', {
           msg: msg,
           room: '<%= chatroom._id %>',
-          author: '<%= user._id %>',
         });
 
         const mychat = document.createElement('div');
