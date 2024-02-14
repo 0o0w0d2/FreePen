@@ -13,7 +13,7 @@
     <div class="mt-3">
       <% for (let i=0; i < chat.length; i++) { %>
       <% if (!chat[i].author.equals(user._id) ) { %>
-      <div class="card my-2 mx-4 px-3 py-3 yourchat" style="min-width: 50%; max-width: 70%">
+      <div class="card my-2 mx-4 px-3 py-3 chat yourchat" style="min-width: 50%; max-width: 70%">
         <h5 class="card-title">
           <%= chatroom.memberName[0]==user.username ? chatroom.memberName[1] :
                                         chatroom.memberName[0] %>
@@ -23,7 +23,7 @@
         </p>
       </div>
       <% } else { %>
-      <div class="card my-2 mx-4 px-3 py-3 bg-secondary-subtle mychat" style="min-width: 50%; max-width: 70%; float: right">
+      <div class="card my-2 mx-4 px-3 py-3 chat bg-secondary-subtle mychat" style="min-width: 50%; max-width: 70%; float: right">
         <h5 class="card-title">
           <%= user.username %>
         </h5>
@@ -61,81 +61,33 @@
       .querySelector('.chat-add')
       .addEventListener('click', async function(e) {
         const msg = document.querySelector('.chat-input').value;
-        await socket.emit('msg', {
+        await socket.emit('msg-client', {
           msg: msg,
           room: '<%= chatroom._id %>',
         });
 
-        const mychat = document.createElement('div');
-        mychat.classList.add(
-          'card',
-          'my-2',
-          'mx-4',
-          'px-3',
-          'py-3',
-          'bg-secondary-subtle',
-          'yourchat',
-        );
-        mychat.style.minWidth = '50%';
-        mychat.style.maxWidth = '70%';
-        mychat.style.float = 'right';
-
-        const username = document.createElement('h5');
-        username.classList.add('card-title');
-        username.textContent = '<%= user.username %>';
-
-        const chatmsg = document.createElement('p');
-        chatmsg.classList.add('card-text');
-        chatmsg.textContent = msg;
-
-        mychat.appendChild(username);
-        mychat.appendChild(chatmsg);
-
-        const emptydiv = document.querySelector('.empty');
-        emptydiv.parentNode.insertBefore(mychat, emptydiv);
-
         document.querySelector('.chat-input').value = '';
-
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: 'smooth',
-        });
       });
 
-    socket.on('msg', (data) => {
-      if (data.author != '<%= user._id %>') {
-        const yourchat = document.createElement('div');
-        yourchat.classList.add(
-          'card',
-          'my-2',
-          'mx-4',
-          'px-3',
-          'py-3',
-          'mychat',
-        );
-        yourchat.style.minWidth = '50%';
-        yourchat.style.maxWidth = '70%';
+    socket.on('msg-server', (data) => {
+      // server에서 받은 data의 author == user라면 class : bg-secondary-subtle mychat class
+      // 아니라면 class : yourchat
+      const chatclass = data.author == '<%= user._id %>' ? "mychat bg-secondary-subtle" :
+        "yourchat"
 
-        const username = document.createElement('h5');
-        username.classList.add('card-title');
-        username.textContent =
-          '<%= chatroom.memberName[0] == user.username ? chatroom.memberName[1] : chatroom.memberName[0] %>';
+      const mychatstyle = data.author == '<%= user._id %>' ? 'float: right' : ''
+      const yourname = '<%= chatroom.memberName[0]==user.username ? chatroom.memberName[1] : chatroom.memberName[0] %>'
+      const myname = '<%= user.username %>'
+      const name = data.author == '<%= user._id %>' ? myname : yourname
 
-        const chatmsg = document.createElement('p');
-        chatmsg.classList.add('card-text');
-        chatmsg.textContent = data.msg;
+      const emptydiv = document.querySelector('.empty');
+      emptydiv.insertAdjacentHTML('beforebegin', `<div class="card my-2 mx-4 px-3 py-3 chat ${chatclass}" style="min-width: 50%; max-width: 70%; ${mychatstyle}">
+        <h5 class="card-title">${name}</h5><p class="card-text">${data.msg}</p></div>`)
 
-        yourchat.appendChild(username);
-        yourchat.appendChild(chatmsg);
-
-        const emptydiv = document.querySelector('.empty');
-        emptydiv.parentNode.insertBefore(yourchat, emptydiv);
-
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: 'smooth',
-        });
-      }
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth',
+      });
     });
   </script>
 

@@ -31,10 +31,11 @@ module.exports = (io) => {
 
         socket.on('room-join', async (data) => {
             console.log('room Id :', data);
+            // 자신이 속해있는 room에만 들어갈 수 있도록
             socket.join(data);
         });
 
-        socket.on('msg', async (data) => {
+        socket.on('msg-client', async (data) => {
             console.log('클라이언트가 보낸 data', data);
 
             await db.collection('chat').insertOne({
@@ -44,9 +45,10 @@ module.exports = (io) => {
                 createdAt: new Date(),
             });
 
-            io.to(data.room).emit('msg', {
+            io.to(data.room).emit('msg-server', {
                 msg: data.msg,
-                author: data.author,
+                // 댓글 작성자를 보내야, 댓글 작성자를 비교할 수 있지 않나?
+                author: author,
             });
         });
     });

@@ -78,7 +78,6 @@ chatRotuer.post('/chatroom-add', isLogin, async (req, res, next) => {
 });
 
 // 채팅방 상세 가져오기
-// 채팅방에 속해있는 유저만 접근할 수 있도록 추가
 chatRotuer.get('/:roomId', isLogin, async (req, res, next) => {
     const chatroomId = req.params.roomId;
 
