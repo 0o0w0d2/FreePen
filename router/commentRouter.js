@@ -11,7 +11,7 @@ connectToMongoDB
         db = client.db('forum');
     })
     .catch((err) => {
-        console.log(err);
+        console.error(err);
     });
 
 // % ajax % POST ) comment
@@ -38,8 +38,8 @@ commentRouter.post('/:postId', isLogin, async (req, res, next) => {
 
         res.status(201).send({ message: '댓글 작성 완료' });
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 
@@ -63,10 +63,10 @@ commentRouter.delete('/:commentId', isLogin, async (req, res, next) => {
             .collection('comment')
             .deleteOne({ _id: new ObjectId(commentId) });
 
-        res.status(204).send({ message: '삭제 완료' });
+        res.status(204).json({ message: '삭제 완료' });
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 

@@ -17,26 +17,32 @@ connectToMongoDB
 // GET ) 내가 참여하고 있는 채팅방들
 chatRotuer.get('/list', isLogin, async (req, res, next) => {
     const user = req.user._id;
-    const chatList = await db
-        .collection('chatroom')
-        .find({
-            member: user,
-        })
-        .toArray();
 
-    // 최근 채팅 하나 가져오기
-    let recentchat = [];
-    for (let i = 0; i < chatList.length; i++) {
-        const chat = await db
-            .collection('chat')
-            .findOne({ roomId: chatList[i]._id }, { sort: { _id: -1 } });
+    try {
+        const chatList = await db
+            .collection('chatroom')
+            .find({
+                member: user,
+            })
+            .toArray();
 
-        recentchat.push(chat ? chat.msg : '');
+        // 최근 채팅 하나 가져오기
+        let recentchat = [];
+        for (let i = 0; i < chatList.length; i++) {
+            const chat = await db
+                .collection('chat')
+                .findOne({ roomId: chatList[i]._id }, { sort: { _id: -1 } });
+
+            recentchat.push(chat ? chat.msg : '');
+        }
+
+        console.log(recentchat);
+
+        res.render('chat/chatList.ejs', { chatList: chatList, recentchat });
+    } catch (err) {
+        console.error(err);
+        next(err);
     }
-
-    console.log(recentchat);
-
-    res.render('chat/chatList.ejs', { chatList: chatList, recentchat });
 });
 
 // postlist의 채팅하기 버튼을 누르면 채팅방을 생성
@@ -72,8 +78,8 @@ chatRotuer.post('/chatroom-add', isLogin, async (req, res, next) => {
 
         res.send(chatroom._id);
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 
@@ -109,11 +115,9 @@ chatRotuer.get('/:roomId', isLogin, async (req, res, next) => {
             chat: chat.reverse(),
         });
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
-
-// document 채팅 ( 채팅 _id, 채팅방 _id, 보낸 사람, 받는 사람 )
 
 module.exports = chatRotuer;

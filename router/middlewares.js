@@ -3,7 +3,7 @@ const isLogin = (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {
-        res.status(403).send({ message: '로그인을 확인해주세요.' });
+        res.status(403).json({ message: '로그인을 확인해주세요.' });
     }
 };
 
@@ -12,7 +12,7 @@ const isNotLogin = (req, res, next) => {
     if (!req.isAuthenticated()) {
         next();
     } else {
-        res.redirect('/post/list/1');
+        res.redirect('/post/list');
     }
 };
 

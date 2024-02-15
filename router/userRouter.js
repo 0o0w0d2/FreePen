@@ -63,8 +63,8 @@ userRouter.post('/register', isNotLogin, async (req, res, next) => {
 
         res.redirect('/user/login');
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send({ message: err.message });
+        console.error(err);
+        next(err);
     }
 });
 
@@ -95,8 +95,8 @@ userRouter.post('/login', isNotLogin, async (req, res, next) => {
             });
         })(req, res, next);
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 
@@ -134,8 +134,8 @@ userRouter.get('/post/:userId', isLogin, async (req, res, next) => {
             author,
         });
     } catch (err) {
-        console.log(err);
-        res.status(500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 

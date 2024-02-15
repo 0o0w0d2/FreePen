@@ -74,7 +74,7 @@
 
   <script>
     document
-      .getElementsByClassName('search-btn')[0]
+      .querySelector('.search-btn')
       .addEventListener('click', async (e) => {
         try {
           const search = document.querySelector('.search').value;
@@ -102,8 +102,6 @@
   </script>
 
   <script>
-    // 데이터 가져와서 데이터를 바꿔치기 하는 코드를 작성하자
-    // ajax 이용해서 /post/search?value=${search}&page=?? 이런식으로 ?
     document.querySelector('.next').addEventListener('click', (e) => {
       console.log('다음 버튼 클릭');
       const maxPage = '<%= parseInt(maxPage) %>';

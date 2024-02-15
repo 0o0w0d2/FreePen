@@ -20,7 +20,7 @@ connectToMongoDB
     });
 
 // GET ) post List ( pagination 추가 )
-postRouter.get('/list', async (req, res) => {
+postRouter.get('/list', async (req, res, next) => {
     const page = req.query.page ? req.query.page : 1;
     const postCount = await db.collection('post').countDocuments();
     const maxPage = Math.ceil(postCount / 5);
@@ -52,13 +52,13 @@ postRouter.get('/list', async (req, res) => {
             maxPage,
         });
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send({ message: err.message });
+        console.error(err);
+        next(err);
     }
 });
 
 // GET ) post add 페이지
-postRouter.get('/write', isLogin, async (req, res) => {
+postRouter.get('/write', isLogin, async (req, res, next) => {
     res.render('post/write.ejs');
 });
 
@@ -87,8 +87,8 @@ postRouter.post('/', isLogin, upload.single('img1'), async (req, res, next) => {
 
         res.redirect(`/post/detail/${postId}`);
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send({ message: err.message });
+        console.error(err);
+        next(err);
     }
 });
 
@@ -102,7 +102,7 @@ postRouter.get('/detail/:postId', async (req, res, next) => {
 
         // _id가 일치하는 post가 없을 때
         if (!post) {
-            const error = new Error('글을 찾을 수 없습니다.');
+            const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
@@ -114,14 +114,13 @@ postRouter.get('/detail/:postId', async (req, res, next) => {
 
         res.render('post/detail.ejs', { post: post, comments: comments });
     } catch (err) {
-        console.log(err);
-
-        res.status(err.statusCode || 500).send({ message: err.message });
+        console.error(err);
+        next(err);
     }
 });
 
 // GET ) post-edit form
-postRouter.get('/edit/:postId', isLogin, async (req, res) => {
+postRouter.get('/edit/:postId', isLogin, async (req, res, next) => {
     try {
         const postId = req.params.postId;
         const _id = new ObjectId(postId);
@@ -130,31 +129,30 @@ postRouter.get('/edit/:postId', isLogin, async (req, res) => {
 
         if (!post.author.equals(req.user._id)) {
             const error = new Error('수정할 권한이 없습니다.');
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
         if (!post) {
-            const error = new Error('글을 찾을 수 없습니다.');
+            const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
 
         res.render('post/edit.ejs', { post: post });
     } catch (err) {
-        console.log(err);
-
-        res.status(err.statusCode || 500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 
 // PUT ) post detail (method-override lib 사용)
-postRouter.put('/detail/:postId', isLogin, async (req, res) => {
+postRouter.put('/detail/:postId', isLogin, async (req, res, next) => {
     try {
         const postId = req.params.postId;
 
         if (!ObjectId.isValid(postId)) {
-            const error = new Error('올바르지 않은 postId입니다.');
+            const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
@@ -168,12 +166,12 @@ postRouter.put('/detail/:postId', isLogin, async (req, res) => {
 
         if (!post.author.equals(req.user._id)) {
             const error = new Error('수정할 권한이 없습니다.');
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
         if (!post) {
-            const error = new Error('글을 찾을 수 없습니다.');
+            const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
@@ -184,13 +182,13 @@ postRouter.put('/detail/:postId', isLogin, async (req, res) => {
 
         res.redirect(`/post/detail/${postId}`);
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send({ message: err.message });
+        console.error(err);
+        next(err);
     }
 });
 
 // Delete ) post detail
-postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
+postRouter.delete('/detail/:postId', isLogin, async (req, res, next) => {
     try {
         const postId = req.params.postId;
         const _id = new ObjectId(postId);
@@ -199,22 +197,22 @@ postRouter.delete('/detail/:postId', isLogin, async (req, res) => {
 
         if (!post.author.equals(req.user._id)) {
             const error = new Error('삭제할 권한이 없습니다.');
-            error.statusCode = 404;
+            error.statusCode = 403;
             throw error;
         }
 
         if (!post) {
-            const error = new Error('글을 찾을 수 없습니다.');
+            const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
 
         await db.collection('post').deleteOne({ _id });
 
-        res.status(204).send({ message: '삭제 완료' });
+        res.status(204).json({ message: '삭제 완료' });
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send({ message: err.message });
+        console.error(err);
+        next(err);
     }
 });
 
@@ -228,7 +226,7 @@ postRouter.get('/search', async (req, res, next) => {
 
     try {
         if (page < 1) {
-            const error = new Error('페이지를 찾을 수 없습니다.');
+            const error = new Error('찾을 수 없는 페이지입니다.');
             error.statusCode = 404;
             throw error;
         }
@@ -268,8 +266,8 @@ postRouter.get('/search', async (req, res, next) => {
             maxPage,
         });
     } catch (err) {
-        console.log(err);
-        res.status(err.statusCode || 500).send(err.message);
+        console.error(err);
+        next(err);
     }
 });
 
