@@ -160,8 +160,6 @@ postRouter.put('/detail/:postId', isLogin, async (req, res, next) => {
         const _id = new ObjectId(postId);
         const { title, content } = req.body;
 
-        checkLength('title', title, 100);
-
         const post = await db.collection('post').findOne({ _id });
 
         if (!post.author.equals(req.user._id)) {

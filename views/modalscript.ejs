@@ -1,0 +1,20 @@
+<script>
+  // 모달 표시 함수
+  function showErrorModal(message) {
+    const modal = document.querySelector('#errorModal');
+    const modalBody = document.querySelector('#errorModalBody');
+    modalBody.textContent = message;
+    modal.classList.add('show');
+    modal.style.display = 'block';
+  }
+
+  // 모달 닫기 이벤트 핸들러
+  function closeModal() {
+    document.querySelectorAll('.modal-close').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.target.closest('.modal').classList.remove('show');
+        e.target.closest('.modal').style.display = 'none';
+      });
+    });
+  }
+</script>
