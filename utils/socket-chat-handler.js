@@ -1,5 +1,3 @@
-// 분리아직 X
-
 const express = require('express');
 const app = express();
 
@@ -20,19 +18,19 @@ connectToMongoDB
         console.log(err);
     });
 
-const server = createServer(app); // HTTP 서버 생성
-const io = new Server(server); // websocket 서버 생성
-
 module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log('websocket 연결됨');
 
+        // room join code
         socket.on('room-join', async (data) => {
             try {
                 console.log('room Id :', data);
 
+                // passport를 이용해 _id 값을 알아냄
                 const author = socket.request.session.passport.user.id;
 
+                // roomId에 맞는 chatroom을 찾고 현재 접속 중인 사용자가 chatroom의 member일 경우에만 접근을 허용하도록 설정
                 const chatroom = await db
                     .collection('chatroom')
                     .findOne({ _id: new ObjectId(data) });
@@ -55,6 +53,7 @@ module.exports = (io) => {
             }
         });
 
+        // msg(client) => db 저장
         socket.on('msg-client', async (data) => {
             try {
                 console.log('클라이언트가 보낸 data', data);
@@ -68,6 +67,7 @@ module.exports = (io) => {
                     createdAt: new Date(),
                 });
 
+                // db에 저장된 msg를 server => client 전달
                 io.to(data.room).emit('msg-server', {
                     msg: data.msg,
                     author: author,

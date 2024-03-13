@@ -1,3 +1,4 @@
+<!-- 1:1 대화일 때만 적용 -->
 <!DOCTYPE html>
 <html lang="en">
 <%- include('../head.ejs') %>
@@ -75,12 +76,16 @@
       const chatclass = data.author == '<%= user._id %>' ? "mychat bg-secondary-subtle" :
         "yourchat"
 
+      // data.author == user 라면 오른쪽 정렬
       const mychatstyle = data.author == '<%= user._id %>' ? 'float: right' : ''
+
+      // 이름 설정 -> 두 명의 대화일 때만 적용됨
       const yourname = '<%= chatroom.memberName[0]==user.username ? chatroom.memberName[1] : chatroom.memberName[0] %>'
       const myname = '<%= user.username %>'
       const name = data.author == '<%= user._id %>' ? myname : yourname
 
       const emptydiv = document.querySelector('.empty');
+      // emptydiv의 위에 HTML을 삽입
       emptydiv.insertAdjacentHTML('beforebegin', `<div class="card my-2 mx-4 px-3 py-3 chat ${chatclass}" style="min-width: 50%; max-width: 70%; ${mychatstyle}">
         <h5 class="card-title">${name}</h5><p class="card-text">${data.msg}</p></div>`)
 

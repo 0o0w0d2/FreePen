@@ -61,6 +61,7 @@ const io = new Server(server); // websocket 서버 생성
 socketChatConfig(io);
 
 // session을 socket.io에서 사용할 수 있도록 설정
+// passport lib를 사용할 때, user의 정보를 알아낼 수 있음
 io.engine.use(sessionMiddleware);
 
 // server.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
@@ -92,7 +93,14 @@ app.use('/chat', require('./router/chatRouter'));
 
 // error handler
 app.use((err, req, res, next) => {
-    if (err.statusCode == 404) {
+    // uri의 param이 mongodb의 ObjectId(_id) 형태를 요구할 때, ObjectId가 아닐 경우 나타나는 error를 404로 추가 처리
+    if (
+        err.statusCode == 404 ||
+        (err.message &&
+            err.message.includes(
+                'Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer',
+            ))
+    ) {
         res.status(404).render('404error.ejs');
     }
 
