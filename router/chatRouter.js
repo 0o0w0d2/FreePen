@@ -50,6 +50,8 @@ chatRotuer.post('/chatroom-add', isLogin, async (req, res, next) => {
     const user = req.user._id;
     const author = req.body.authorId;
     const member = [user, new ObjectId(author)];
+
+    // 멤버의 이름을 비정규화해서 user collection을 거치지 않고 ejs에서 바로 사용할 수 있도록 chatroom에 멤버의 이름 추가
     const myname = req.user.username;
     const yourname = req.body.authorName;
     const memberName = [myname, yourname];

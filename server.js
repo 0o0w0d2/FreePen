@@ -60,6 +60,9 @@ const io = new Server(server); // websocket 서버 생성
 
 socketChatConfig(io);
 
+// mongodb 어댑터 추가를 위한 코드
+const { createAdapter } = require('@socket.io/mongo-adapter');
+
 // session을 socket.io에서 사용할 수 있도록 설정
 // passport lib를 사용할 때, user의 정보를 알아낼 수 있음
 io.engine.use(sessionMiddleware);
@@ -71,6 +74,10 @@ connectToMongoDB
     .then((client) => {
         console.log('MongoDB connected.');
         db = client.db('forum');
+
+        // mongodb adapter가 원래 이렇게 자주 저장되나?? 계속 저장되서 일단 주석 처리
+        // io.adapter(createAdapter(db.collection('socket.io-events')));
+
         // HTTP 서버를 express와 websocket이 공유
         server.listen(port, () => {
             console.log(`Running on http://localhost:${port}`);

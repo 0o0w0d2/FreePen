@@ -48,13 +48,17 @@
     </div>
   </div>
 
+  <!-- socket.io CDN -->
   <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4" crossorigin="anonymous"></script>
 
+  <!-- socket.io 설정 -->
   <script>
+    // 화면이 로드될 경우, 스크롤을 화면 맨 아래로 이동
     window.onload = function() {
       window.scrollTo(0, document.body.scrollHeight);
     };
 
+    // socket.io 연결
     const socket = io();
     socket.emit('room-join', '<%= chatroom._id %>');
 
@@ -62,6 +66,8 @@
       .querySelector('.chat-add')
       .addEventListener('click', async function(e) {
         const msg = document.querySelector('.chat-input').value;
+
+        // msg-client라는 이름으로 msg와 roomId를 server에 전달
         await socket.emit('msg-client', {
           msg: msg,
           room: '<%= chatroom._id %>',
@@ -70,6 +76,8 @@
         document.querySelector('.chat-input').value = '';
       });
 
+    // msg-client로 보낸 data를 server에서 받아서 db에 저장한 후,
+    // server에서 msg-server라는 이름으로 data를 client에 전달
     socket.on('msg-server', (data) => {
       // server에서 받은 data의 author == user라면 class : bg-secondary-subtle mychat class
       // 아니라면 class : yourchat

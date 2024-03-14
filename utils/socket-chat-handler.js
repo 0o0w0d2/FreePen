@@ -25,9 +25,9 @@ module.exports = (io) => {
         // room join code
         socket.on('room-join', async (data) => {
             try {
-                console.log('room Id :', data);
+                console.log('연결된 roomId :', data);
 
-                // passport를 이용해 _id 값을 알아냄
+                // passport를 이용해 user의 _id 값을 알아냄
                 const author = socket.request.session.passport.user.id;
 
                 // roomId에 맞는 chatroom을 찾고 현재 접속 중인 사용자가 chatroom의 member일 경우에만 접근을 허용하도록 설정
