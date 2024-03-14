@@ -92,6 +92,17 @@ app.get('/', (req, res) => {
     res.render('index.ejs');
 });
 
+app.get('/stream', (req, res) => {
+    res.writeHead(200, {
+        Connection: 'keep-alive',
+        'Content-Type': 'text/event-stream',
+        'cache-control': 'no-cache',
+    });
+
+    res.write('event: msg\n');
+    res.write('data: 쪼쪼사랑행\n\n');
+});
+
 // Router 연결
 app.use('/post', require('./router/postRouter'));
 app.use('/user', require('./router/userRouter'));
