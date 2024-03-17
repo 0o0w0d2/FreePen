@@ -14,6 +14,27 @@ connectToMongoDB
         console.log(err);
     });
 
+// list를 불러올 때는 updatedAt을 기준으로 최신순 정렬하기
+// chat이 추가된 것을 확인하고, recentChat이 나오도록 설정
+
+chatRotuer.get('/listdd', async (req, res) => {
+    let doc = [{ $match: { operationType: 'insert' } }];
+
+    const changeStream = await db.collection('chat').watch(doc);
+
+    changeStream.on('change', (result) => {
+        console.log('이거 머야', result);
+    });
+
+    // res.writeHead(200, {
+    //     Connection: 'keep-alive',
+    //     'Content-Type': 'text/event-stream',
+    //     'cache-control': 'no-cache',
+    // });
+    // res.write('event: msg\n');
+    // res.write('data: 쪼쪼사랑행\n\n');
+});
+
 // GET ) 내가 참여하고 있는 채팅방들
 chatRotuer.get('/list', isLogin, async (req, res, next) => {
     const user = req.user._id;

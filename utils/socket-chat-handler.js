@@ -67,6 +67,16 @@ module.exports = (io) => {
                     createdAt: new Date(),
                 });
 
+                await db.collection('chatroom').updateOne(
+                    { _id: new ObjectId(data.room) },
+                    {
+                        $set: {
+                            recentChat: data.msg,
+                            updatedAt: new Date(),
+                        },
+                    },
+                );
+
                 // db에 저장된 msg를 server => client 전달
                 io.to(data.room).emit('msg-server', {
                     msg: data.msg,

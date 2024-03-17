@@ -6,8 +6,6 @@ const { isLogin } = require('./middlewares');
 const { isEmpty, checkLength } = require('./validateInput');
 const { upload } = require('../utils/multer');
 
-// 나중에 에러 next()로 넘겨서 처리하기
-
 // postRouter.js 내에서 db에 접근할 수 있도록 전역 변수로 선언
 let db;
 
@@ -42,6 +40,7 @@ postRouter.get('/list', async (req, res, next) => {
         const postList = await db
             .collection('post')
             .find()
+            .sort({ createdAt: -1 })
             .limit(5)
             .skip((page - 1) * 5)
             .toArray();
