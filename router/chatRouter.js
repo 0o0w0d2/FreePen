@@ -14,25 +14,34 @@ connectToMongoDB
         console.log(err);
     });
 
-// list를 불러올 때는 updatedAt을 기준으로 최신순 정렬하기
 // chat이 추가된 것을 확인하고, recentChat이 나오도록 설정
+chatRotuer.get('/recentchat', async (req, res) => {
+    try {
+        let doc = [{ $match: { operationType: 'insert' } }];
 
-chatRotuer.get('/listdd', async (req, res) => {
-    let doc = [{ $match: { operationType: 'insert' } }];
+        const changeStream = await db.collection('chat').watch(doc);
 
-    const changeStream = await db.collection('chat').watch(doc);
+        changeStream.on('change', (result) => {
+            console.log('이거 머야', result);
 
-    changeStream.on('change', (result) => {
-        console.log('이거 머야', result);
-    });
+            const data = {
+                roomId: result.fullDocument.roomId,
+                msg: result.fullDocument.msg,
+            };
 
-    // res.writeHead(200, {
-    //     Connection: 'keep-alive',
-    //     'Content-Type': 'text/event-stream',
-    //     'cache-control': 'no-cache',
-    // });
-    // res.write('event: msg\n');
-    // res.write('data: 쪼쪼사랑행\n\n');
+            res.write('event: msg\n');
+            res.write(`data: ${JSON.stringify(data)}\n\n`);
+        });
+
+        res.writeHead(200, {
+            Connection: 'keep-alive',
+            'Content-Type': 'text/event-stream',
+            'cache-control': 'no-cache',
+        });
+    } catch (err) {
+        console.error(err);
+        next(err);
+    }
 });
 
 // GET ) 내가 참여하고 있는 채팅방들
@@ -40,26 +49,16 @@ chatRotuer.get('/list', isLogin, async (req, res, next) => {
     const user = req.user._id;
 
     try {
+        // list를 불러올 때는 updatedAt을 기준으로 최신순 정렬하기
         const chatList = await db
             .collection('chatroom')
             .find({
                 member: user,
             })
+            .sort({ updatedAt: -1 })
             .toArray();
 
-        // 최근 채팅 하나 가져오기
-        let recentchat = [];
-        for (let i = 0; i < chatList.length; i++) {
-            const chat = await db
-                .collection('chat')
-                .findOne({ roomId: chatList[i]._id }, { sort: { _id: -1 } });
-
-            recentchat.push(chat ? chat.msg : '');
-        }
-
-        console.log(recentchat);
-
-        res.render('chat/chatList.ejs', { chatList: chatList, recentchat });
+        res.render('chat/chatList.ejs', { chatList: chatList });
     } catch (err) {
         console.error(err);
         next(err);
