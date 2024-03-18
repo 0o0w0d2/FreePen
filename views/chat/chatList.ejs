@@ -29,36 +29,42 @@
   </div>
   <% } %>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+  <%- include('../sessionChecker.ejs') %>
+
+  <script>
+    const eventSource = new EventSource('/chat/recentchat')
+
+    eventSource.addEventListener('msg', function(e) {
+      console.log('parsing JSON', JSON.parse(e.data))
+
+      const roomId = JSON.parse(e.data).roomId
+      const msg = JSON.parse(e.data).msg
+
+      // dataset.id가 roomId와 같은 div를 지우고, ('.title')의 바로 아래에 삽입 ( insertAdjacentHTML 사용 )
+      const receiver = document.querySelector(`div[roomId="${roomId}"]`).querySelector('.card-title').textContent
+      document.querySelector(`div[roomId="${roomId}"]`).remove()
+      document.querySelector('.title').insertAdjacentHTML('afterend', `<div class="card my-3 mx-4 px-3 py-3 listcard" style="max-width: 100%; min-height: 100%" roomId="${roomId}">
+      <a href="/chat/${roomId}" class="none">
+        <div class="row g-0">
+          <div class="col-md-8">
+            <h5 class="card-title">
+              ${receiver}
+            </h5>
+            <p class="card-text">
+              ${msg}
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>`)
+    })
+  </script>
+
+
 </body>
 
-<script>
-  const eventSource = new EventSource('/chat/recentchat')
 
-  eventSource.addEventListener('msg', function(e) {
-    console.log('parsing JSON', JSON.parse(e.data))
-
-    const roomId = JSON.parse(e.data).roomId
-    const msg = JSON.parse(e.data).msg
-
-    // dataset.id가 roomId와 같은 div를 지우고, ('.title')의 바로 아래에 삽입 ( insertAdjacentHTML 사용 )
-    const receiver = document.querySelector(`div[roomId="${roomId}"]`).querySelector('.card-title').textContent
-    document.querySelector(`div[roomId="${roomId}"]`).remove()
-    document.querySelector('.title').insertAdjacentHTML('afterend', `<div class="card my-3 mx-4 px-3 py-3 listcard" style="max-width: 100%; min-height: 100%" roomId="${roomId}">
-    <a href="/chat/${roomId}" class="none">
-      <div class="row g-0">
-        <div class="col-md-8">
-          <h5 class="card-title">
-            ${receiver}
-          </h5>
-          <p class="card-text">
-            ${msg}
-          </p>
-        </div>
-      </div>
-    </a>
-  </div>`)
-  })
-</script>
 
 
 </html>
